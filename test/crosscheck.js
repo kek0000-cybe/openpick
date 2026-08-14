@@ -48,13 +48,13 @@ for (const [idx, c] of CASES.entries()) {
   await page.fill('#backups', String(c.backups));
   await page.click('#run');
   await page.waitForFunction(
-    (n) => document.querySelectorAll('#o-winners .winner-handle').length === n, c.winners);
+    (n) => document.querySelectorAll('#o-winners .kazanan-ad').length === n, c.winners);
 
   const web = await page.evaluate(() => ({
     commit: document.getElementById('o-commit').textContent,
     seed: document.getElementById('o-seed').textContent,
-    winners: [...document.querySelectorAll('#o-winners .winner-handle')].map((e) => e.textContent.slice(1)),
-    backups: [...document.querySelectorAll('#o-backups .winner-handle')].map((e) => e.textContent.slice(1)),
+    winners: [...document.querySelectorAll('#o-winners .kazanan-ad')].map((e) => e.textContent.slice(1)),
+    backups: [...document.querySelectorAll('#o-backups .kazanan-ad')].map((e) => e.textContent.slice(1)),
   }));
 
   const same = web.commit === node.commit && web.seed === node.seed &&
@@ -76,14 +76,14 @@ for (const entry of fs.readdirSync(DOCS, { withFileTypes: true })) {
 
   await page.goto(pathToFileURL(path.join(DOCS, entry.name, 'index.html')).href);
   await page.waitForFunction(
-    (n) => document.querySelectorAll('#winners .winner-handle').length === n, meta.winners.length);
+    (n) => document.querySelectorAll('#winners .kazanan-ad').length === n, meta.winners.length);
 
   const shown = await page.evaluate(() => ({
-    winners: [...document.querySelectorAll('#winners .winner-handle')].map((e) => e.textContent.slice(1)),
+    winners: [...document.querySelectorAll('#winners .kazanan-ad')].map((e) => e.textContent.slice(1)),
     seed: document.getElementById('f-seed').textContent,
     // Her tur sayfada yeniden hesaplanip kayitla karsilastiriliyor;
     // bir tanesi bile uyusmazsa uyari sinifi basilir.
-    badSteps: document.querySelectorAll('#steps .notice.bad').length,
+    badSteps: document.querySelectorAll('#steps .uyari.kotu').length,
   }));
 
   const listFile = path.join(DOCS, entry.name, 'katilimcilar.txt');

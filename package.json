@@ -11,6 +11,7 @@
     "verify": "node src/verify.js",
     "publish": "node src/publish.js",
     "site": "node src/site.js",
+    "panel": "node src/panel.js",
     "fixtures": "node test/fixtures.js",
     "test": "node --test test/fairness.test.js test/parity.test.js",
     "crosscheck": "node test/crosscheck.js",

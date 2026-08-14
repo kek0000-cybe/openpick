@@ -1,227 +1,250 @@
 /*
  * Çekiliş sayfasının davranışı.
  *
- * NOT: Bu dosya publish.js tarafından engine.js ve chain.js ile birlikte
- * TEK bir <script> bloğuna gömülür. Bu yüzden import yazmaz; yukarıdaki iki
- * dosyanın tanımlarını doğrudan kullanır. İsim çakışmasını önlemek için
- * buradaki her şey "p" öneki taşır ya da benzersizdir.
+ * NOT: publish.js bu dosyayı engine.js ve chain.js ile birlikte TEK bir
+ * <script> bloğuna gömer. Bu yüzden import yazmaz; yukarıdaki iki dosyanın
+ * tanımlarını doğrudan kullanır. İsim çakışmasını önlemek için buradaki her
+ * şey "p" öneki taşır.
  */
 const pDraw = window.__CEKILIS__;
 const pEl = (id) => document.getElementById(id);
 const pPad = (n) => String(n).padStart(2, '0');
+const pSleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const pRevealed = { blockHash: null, result: null, confirmedBy: 0 };
+
+const EVRE_ADI = {
+  'acik': 'Katılım açık',
+  'kilitli': 'Katılım kapandı',
+  'blok-bekleniyor': 'Blok bekleniyor',
+  'sonuclandi': 'Sonuçlandı',
+};
 
 function pPhase(now = Date.now()) {
   if (!pDraw.commit) return 'acik';
-  if (pDraw.bitcoin && pDraw.bitcoin.blockHash) return 'sonuclandi';
-  if (pRevealed.blockHash) return 'sonuclandi';
+  if (pDraw.bitcoin?.blockHash || pRevealed.blockHash) return 'sonuclandi';
   if (now < new Date(pDraw.drawAt).getTime()) return 'kilitli';
   return 'blok-bekleniyor';
 }
 
-const pRevealed = { blockHash: null, result: null };
-
 function pShow(phase) {
   for (const node of document.querySelectorAll('[data-phase]')) {
-    node.classList.toggle('hidden', !node.dataset.phase.split(' ').includes(phase));
+    node.classList.toggle('gizli', !node.dataset.phase.split(' ').includes(phase));
   }
+  const ad = pEl('evre-ad');
+  if (ad && EVRE_ADI[phase]) ad.textContent = EVRE_ADI[phase];
 }
 
-/* ---------- Geri sayım ---------- */
-function pTickClock() {
+/* ---------- ikon ---------- */
+function pIkon(d, opts = {}) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', opts.w ?? '2.5');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', d);
+  svg.appendChild(path);
+  return svg;
+}
+const IKON_ONAY = 'M20 6 9 17l-5-5';
+
+/* ---------- geri sayım ---------- */
+function pTick() {
   const phase = pPhase();
   pShow(phase);
 
   const box = pEl('clock');
-  if (!box) return;
-  const targetIso = phase === 'acik' ? pDraw.lockAt || pDraw.drawAt : pDraw.drawAt;
-  if (!targetIso) return;
-
-  let left = Math.max(0, new Date(targetIso).getTime() - Date.now());
-  const s = Math.floor(left / 1000);
-  const parts = [Math.floor(s / 3600), Math.floor((s % 3600) / 60), s % 60];
-  const cells = box.querySelectorAll('.clock-num');
-  if (cells.length === 3) {
-    cells[0].textContent = pPad(parts[0]);
-    cells[1].textContent = pPad(parts[1]);
-    cells[2].textContent = pPad(parts[2]);
+  if (box) {
+    const hedef = phase === 'acik' ? (pDraw.lockAt || pDraw.drawAt) : pDraw.drawAt;
+    if (hedef) {
+      const kalan = Math.max(0, new Date(hedef).getTime() - Date.now());
+      const s = Math.floor(kalan / 1000);
+      const hucre = box.querySelectorAll('.saat-sayi');
+      if (hucre.length === 3) {
+        hucre[0].textContent = pPad(Math.floor(s / 3600));
+        hucre[1].textContent = pPad(Math.floor((s % 3600) / 60));
+        hucre[2].textContent = pPad(s % 60);
+      }
+    }
   }
 
-  if (phase === 'blok-bekleniyor') pStartWatching();
-  if (phase === 'sonuclandi') pRenderResult();
+  if (phase === 'blok-bekleniyor') pIzlemeBaslat();
+  if (phase === 'sonuclandi') pSonucCiz();
 }
 
-/* ---------- Blok bekleme ve canlı açılış ---------- */
-let pWatching = false;
-let pStopAt = 0;
+/* ---------- blok bekleme, canlı açılış ---------- */
+let pIzliyor = false;
+let pDurmaAni = 0;
 
-async function pStartWatching() {
-  if (pWatching) return;
-  pWatching = true;
-  pStopAt = Date.now() + 2 * 60 * 60 * 1000; // 2 saat sonra elle denemeye bırak
-  pWatchLoop();
+function pIzlemeBaslat() {
+  if (pIzliyor) return;
+  pIzliyor = true;
+  pDurmaAni = Date.now() + 2 * 60 * 60 * 1000;
+  pIzlemeDongusu();
 }
 
-async function pWatchLoop() {
+async function pIzlemeDongusu() {
   const height = pDraw.bitcoin.targetHeight;
-  const status = pEl('watch-status');
+  const durum = pEl('watch-status');
 
-  while (Date.now() < pStopAt) {
-    if (document.visibilityState === 'hidden') {
-      await pSleep(5000);
-      continue;
-    }
+  while (Date.now() < pDurmaAni) {
+    if (document.visibilityState === 'hidden') { await pSleep(5000); continue; }
     try {
       const tip = await currentHeight();
-      if (status) {
-        const away = Math.max(0, height - tip);
-        status.textContent = away === 0
-          ? 'Blok kazıldı, sonuç hesaplanıyor...'
-          : `Hedef blok ${height} · şu anki yükseklik ${tip} · yaklaşık ${away * 10} dakika`;
+      if (durum) {
+        const uzak = Math.max(0, height - tip);
+        durum.textContent = uzak === 0
+          ? 'Blok kazıldı, sonuç hesaplanıyor…'
+          : `Hedef blok ${height} · şu anki yükseklik ${tip} · yaklaşık ${uzak * 10} dakika`;
       }
       const { hash, confirmedBy } = await hashAtHeightConfirmed(height);
       if (hash) {
         pRevealed.blockHash = hash;
         pRevealed.confirmedBy = confirmedBy;
-        await pComputeLive(hash);
+        await pCanliHesapla(hash);
         return;
       }
     } catch (err) {
-      if (status) status.textContent = `Blok sorgulanamadı: ${err.message} — tekrar denenecek.`;
+      if (durum) durum.textContent = `Blok sorgulanamadı: ${err.message} — tekrar denenecek.`;
     }
     // Sıçramalı bekleme: yüzlerce ziyaretçi aynı anda ücretsiz API'yi dövmesin.
     await pSleep(20000 + Math.random() * 20000);
   }
-  const retry = pEl('watch-retry');
-  if (retry) retry.classList.remove('hidden');
-  pWatching = false;
+  pEl('watch-retry')?.classList.remove('gizli');
+  pIzliyor = false;
 }
 
-const pSleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-async function pComputeLive(blockHash) {
-  const list = await fetch('katilimcilar.txt').then((r) => r.text());
-  const handles = list.split('\n').filter(Boolean);
-  const out = await runDraw({
-    handles,
+async function pCanliHesapla(blockHash) {
+  const liste = await fetch('katilimcilar.txt').then((r) => r.text());
+  pRevealed.result = await runDraw({
+    handles: liste.split('\n').filter(Boolean),
     blockHash,
     winnerCount: pDraw.winnerCount,
     backupCount: pDraw.backupCount,
     commit: pDraw.commit,
   });
-  pRevealed.result = out;
   pShow('sonuclandi');
-  const banner = pEl('live-banner');
-  if (banner) banner.classList.remove('hidden');
-  pRenderResult();
+  pEl('live-banner')?.classList.remove('gizli');
+  pSonucCiz();
 }
 
-/* ---------- Sonuç ---------- */
-let pRendered = false;
+/* ---------- sonuç ---------- */
+let pCizildi = false;
 
-async function pRenderResult() {
-  if (pRendered) return;
-  pRendered = true;
+async function pSonucCiz() {
+  if (pCizildi) return;
+  pCizildi = true;
 
-  const data = pRevealed.result
+  const d = pRevealed.result
     ? { ...pDraw, ...pRevealed.result, bitcoin: { ...pDraw.bitcoin, blockHash: pRevealed.blockHash } }
     : pDraw;
 
   const bh = pEl('f-blockhash');
-  if (bh) bh.textContent = data.bitcoin.blockHash || '—';
+  if (bh) bh.textContent = d.bitcoin?.blockHash || '—';
   const sd = pEl('f-seed');
-  if (sd) sd.textContent = data.seed || '—';
+  if (sd) sd.textContent = d.seed || '—';
 
-  const wbox = pEl('winners');
-  if (wbox && data.winners) {
-    wbox.innerHTML = '';
-    data.winners.forEach((h, i) => wbox.appendChild(pWinnerRow(i + 1, h, true)));
-    const bbox = pEl('backups');
-    if (bbox && data.backups && data.backups.length) {
-      bbox.innerHTML = '';
-      data.backups.forEach((h, i) => bbox.appendChild(pWinnerRow(i + 1, h, false)));
-      const bs = pEl('backups-section');
-      if (bs) bs.classList.remove('hidden');
+  const kutu = pEl('winners');
+  if (kutu && d.winners) {
+    kutu.replaceChildren(...d.winners.map((h, i) => pKazananSatir(i + 1, h, true)));
+    if (d.backups?.length) {
+      pEl('backups')?.replaceChildren(...d.backups.map((h, i) => pKazananSatir(i + 1, h, false)));
+      pEl('backups-section')?.classList.remove('gizli');
     }
   }
-  if (data.steps && data.seed) await pAnimateSteps(data.steps, data.seed);
+  if (d.steps && d.seed) await pAdimlariCiz(d.steps, d.seed);
 }
 
-function pWinnerRow(rank, handle, isWinner) {
+function pKazananSatir(sira, handle, kazanan) {
   const row = document.createElement('div');
-  row.className = 'winner' + (isWinner ? ' top' : '');
-  const r = document.createElement('span');
-  r.className = 'winner-rank';
-  r.textContent = rank + '.';
-  const h = document.createElement('a');
-  h.className = 'winner-handle';
-  h.href = 'https://x.com/' + encodeURIComponent(handle);
-  h.rel = 'noopener nofollow';
-  h.textContent = '@' + handle;
-  const t = document.createElement('span');
-  t.className = 'winner-tag';
-  t.textContent = isWinner ? 'kazanan' : 'yedek';
-  row.append(r, h, t);
+  row.className = 'kazanan' + (kazanan ? ' birinci' : '');
+  const s = document.createElement('span');
+  s.className = 'kazanan-sira';
+  s.textContent = sira;
+  const a = document.createElement('a');
+  a.className = 'kazanan-ad';
+  a.href = 'https://x.com/' + encodeURIComponent(handle);
+  a.rel = 'noopener nofollow';
+  a.textContent = '@' + handle;
+  const e = document.createElement('span');
+  e.className = 'kazanan-etiket';
+  e.textContent = kazanan ? 'kazanan' : 'yedek';
+  row.append(s, a, e);
   return row;
 }
 
-/* ---------- Adım adım matematik ---------- */
-async function pAnimateSteps(steps, seed) {
-  const box = pEl('steps');
-  if (!box) return;
-  box.innerHTML = '';
+/* ---------- adım adım matematik ---------- */
+async function pAdimlariCiz(steps, seed) {
+  const kutu = pEl('steps');
+  if (!kutu) return;
+  kutu.replaceChildren();
   const key = await seedKey(seed);
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const azalt = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   for (const st of steps) {
     // Kayıtlı değeri göstermekle yetinmiyoruz: turu tarayıcıda YENİDEN hesaplayıp
     // kayıtla karşılaştırıyoruz. Animasyon süs değil, canlı kanıt.
-    const again = await drawIndexDetailed(key, st.round, st.remaining);
-    const ok = again.offset === st.offset && again.value === st.value;
+    const tekrar = await drawIndexDetailed(key, st.round, st.remaining);
+    const uygun = tekrar.offset === st.offset && tekrar.value === st.value;
 
     const el = document.createElement('div');
-    el.className = 'step';
-    const head = document.createElement('div');
-    head.className = 'step-head';
-    const round = document.createElement('span');
-    round.className = 'step-round';
-    round.textContent = `Tur ${st.round + 1} · havuzda ${st.remaining} kişi`;
-    const pick = document.createElement('span');
-    pick.className = 'step-pick';
-    pick.textContent = '@' + st.picked;
-    head.append(round, pick);
+    el.className = 'adim';
 
-    const math = document.createElement('div');
-    math.className = 'step-math';
-    math.textContent =
+    const bas = document.createElement('div');
+    bas.className = 'adim-bas';
+    const tur = document.createElement('span');
+    tur.className = 'adim-tur';
+    tur.textContent = `Tur ${st.round + 1} · havuzda ${st.remaining} kişi`;
+    const sec = document.createElement('span');
+    sec.className = 'adim-secilen';
+    sec.textContent = '@' + st.picked;
+    bas.append(tur, sec);
+
+    const mat = document.createElement('div');
+    mat.className = 'adim-mat';
+    mat.textContent =
       `HMAC(tohum, "${st.round}:${st.attempt}") → ilk 6 bayt = ${st.value}\n` +
-      `${st.value} mod ${st.remaining} = ${st.offset} → sıradaki konum ${st.swappedWith}`;
-    math.style.whiteSpace = 'pre-line';
+      `${st.value} mod ${st.remaining} = ${st.offset} → konum ${st.swappedWith}`;
 
-    const check = document.createElement('div');
-    check.className = ok ? 'step-ok' : 'notice bad';
-    check.textContent = ok
-      ? 'bu turu tarayıcın yeniden hesapladı, kayıtla aynı'
-      : 'UYARI: yeniden hesaplama kayıtla uyuşmadı';
+    const onay = document.createElement('div');
+    if (uygun) {
+      onay.className = 'adim-onay';
+      onay.append(pIkon(IKON_ONAY), document.createTextNode('bu turu tarayıcın yeniden hesapladı, kayıtla aynı'));
+    } else {
+      onay.className = 'uyari kotu';
+      onay.textContent = 'UYARI: yeniden hesaplama kayıtla uyuşmadı';
+    }
 
-    el.append(head, math, check);
-    box.appendChild(el);
-    if (reduced) el.classList.add('on');
+    el.append(bas, mat, onay);
+    kutu.appendChild(el);
+    if (azalt) el.classList.add('acik');
     else {
-      await pSleep(420);
-      requestAnimationFrame(() => el.classList.add('on'));
+      await pSleep(380);
+      requestAnimationFrame(() => el.classList.add('acik'));
     }
   }
 }
 
-/* ---------- Başlat ---------- */
-pTickClock();
-setInterval(pTickClock, 1000);
+/* ---------- tema ---------- */
+(() => {
+  const dugme = pEl('tema');
+  const uygula = (v) => {
+    document.body.dataset.theme = v;
+    try { localStorage.setItem('tema', v); } catch (e) { /* özel mod */ }
+  };
+  try { uygula(localStorage.getItem('tema') || 'dark'); } catch (e) { /* özel mod */ }
+  dugme?.addEventListener('click', () =>
+    uygula(document.body.dataset.theme === 'dark' ? 'light' : 'dark'));
+})();
 
-const retryBtn = pEl('watch-retry');
-if (retryBtn) {
-  retryBtn.addEventListener('click', () => {
-    retryBtn.classList.add('hidden');
-    pWatching = false;
-    pStartWatching();
-  });
-}
+/* ---------- başlat ---------- */
+pTick();
+setInterval(pTick, 1000);
+pEl('watch-retry')?.addEventListener('click', (e) => {
+  e.target.classList.add('gizli');
+  pIzliyor = false;
+  pIzlemeBaslat();
+});

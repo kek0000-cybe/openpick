@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "site"],
       "port": 8080
+    },
+    {
+      "name": "panel",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "panel"],
+      "port": 8090
     }
   ]
 }

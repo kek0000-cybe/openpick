@@ -7,67 +7,84 @@
 <meta name="description" content="Kazananın matematiksel olarak seçildiği, herkesin kendi tarayıcısında doğrulayabildiği X çekilişleri.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="tr_TR">
+<meta property="og:site_name" content="openpick">
 <meta property="og:title" content="openpick — kanıtlanabilir adil çekilişler">
-<meta property="og:description" content="Kazananın matematiksel olarak seçildiği, herkesin kendi tarayıcısında doğrulayabildiği X çekilişleri.">
+<meta property="og:description" content="Kazananı kimse seçemez. Liste kilitlenir, tohum Bitcoin ağından gelir, sonucu herkes kendi tarayıcısında doğrular.">
 <meta property="og:url" content="https://kek0000-cybe.github.io/openpick">
 <meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="varlik/site.css">
+<script>(()=>{try{document.documentElement.dataset.t=localStorage.getItem('tema')||'dark'}catch(e){}})()</script>
 </head>
-<body>
-<main>
-  <header class="site-head">
-    <span class="brand" lang="en">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>
-      openpick
-    </span>
-    <nav class="nav">
-      <a href="dogrula/">Doğrula</a>
-      <a href="https://github.com/kek0000-cybe/openpick" rel="noopener">Kaynak kodu</a>
-    </nav>
-  </header>
+<body data-theme="dark">
 
+<header class="serit">
+  <span class="marka" lang="en">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 7v5l3 3"/><path d="M17 2.5 22 5l-2.5 5"/></svg>
+    openpick
+  </span>
+  <nav class="gezinme">
+    <a href="dogrula/">Doğrula</a>
+    <a href="https://github.com/kek0000-cybe/openpick" rel="noopener">Kaynak kodu</a>
+    <button class="tema-dugme" id="tema" type="button" aria-label="Temayı değiştir">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+    </button>
+  </nav>
+</header>
+
+<main class="kap">
   <h1>Kazananı kimse seçemez</h1>
-  <p class="lead">
-    Çoğu çekiliş aracı "adil" olduğunu söyler ve kanıt sunmaz — sonucun nereden geldiğini
-    göremezsin. Burada her çekilişin matematiği açık: listeyi kilitliyoruz, tohumu Bitcoin
-    ağından alıyoruz ve kazananı sen kendi tarayıcında yeniden hesaplayabiliyorsun.
+  <p class="giris">
+    Çekiliş araçlarının çoğu "adil" olduğunu söyler ve kanıt sunmaz — sonucun nereden
+    geldiğini göremezsin. Burada her çekilişin matematiği açık: liste kilitlenir, tohum
+    Bitcoin ağından gelir ve kazananı sen kendi tarayıcında yeniden hesaplayabilirsin.
   </p>
 
-  <div class="panel">
-    <div class="panel-head">
-      <span class="panel-title">Nasıl kanıtlanıyor</span>
-      <span class="badge">İki kilit</span>
+  <div class="duzlem">
+    <div class="duzlem-bas">
+      <span class="duzlem-baslik">Nasıl kanıtlanıyor</span>
+      <span class="rozet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+        İki kilit
+      </span>
     </div>
-    <div class="panel-body">
-      <h3>1. Liste sonradan değiştirilemez</h3>
-      <p class="muted">Katılım kapandığında listenin SHA-256 özetini yayınlıyoruz. Tek bir
-        kişi eklense veya çıkarılsa özet tamamen değişir — herkes fark eder.</p>
-      <h3>2. Sonucu kimse önceden bilemez — biz dahil</h3>
-      <p class="muted">Tohum, henüz kazılmamış bir Bitcoin bloğunun hash'i. O blok
-        gelecekte olduğu için hash'ini kimse bilemez, kimse etkileyemez.</p>
-      <p class="dim">İkisi birleşince: liste kilitlendiğinde sonuç henüz belli değildir,
-        sonuç belli olduğunda liste artık değiştirilemez. Aradaki boşluk kapalıdır.</p>
+    <div class="duzlem-govde">
+      <h3>1 — Liste sonradan değiştirilemez</h3>
+      <p class="ikincil">Katılım kapandığında listenin SHA-256 özeti yayınlanır. Tek bir
+        kişi eklense ya da çıkarılsa özet tamamen değişir; herkes fark eder.</p>
+      <h3>2 — Sonucu kimse önceden bilemez, biz dahil</h3>
+      <p class="ikincil">Tohum, önceden ilan edilen ama henüz kazılmamış bir Bitcoin
+        bloğunun hash'idir. O blok gelecekte olduğu için kimse bilemez, kimse etkileyemez.</p>
+      <p class="ucuncul">İkisi birleşince aradaki boşluk kapanır: liste kilitlendiğinde
+        sonuç henüz belli değildir, sonuç belli olduğunda liste artık değiştirilemez.</p>
     </div>
   </div>
 
-  <h2>Çekilişler</h2>
-  <a class="card" href="1900000000000000002/">
-  <div class="card-top"><span class="card-title">DEMO — geri sayim ornegi</span><span class="pill live">yaklaşan</span></div>
-  <div class="card-meta">420 katılımcı · çekiliş 14 Ağu 2026 13:53</div>
+  <h2 style="margin: var(--sp-9) 0 var(--sp-6)">Çekilişler</h2>
+  <div class="kartlar"><a class="kart hrk-sirali" style="--sira: 0" href="1900000000000000002/">
+  <div class="kart-bas"><span class="kart-baslik">DEMO — geri sayim ornegi</span><span class="rozet"><span class="rozet-nokta"></span>yaklaşan</span></div>
+  <div class="kart-alt">420 katılımcı · çekiliş 14 Ağu 2026 13:53</div>
 </a>
-<a class="card" href="1900000000000000003/">
-  <div class="card-top"><span class="card-title">DEMO — blok bekleme ornegi</span><span class="pill live">yaklaşan</span></div>
-  <div class="card-meta">95 katılımcı · çekiliş 14 Ağu 2026 12:22</div>
+<a class="kart hrk-sirali" style="--sira: 1" href="1900000000000000003/">
+  <div class="kart-bas"><span class="kart-baslik">DEMO — blok bekleme ornegi</span><span class="rozet"><span class="rozet-nokta"></span>yaklaşan</span></div>
+  <div class="kart-alt">95 katılımcı · çekiliş 14 Ağu 2026 12:22</div>
 </a>
-<a class="card" href="1900000000000000001/">
-  <div class="card-top"><span class="card-title">DEMO — sonuclanmis ornek cekilis</span><span class="pill done">sonuçlandı</span></div>
-  <div class="card-meta">180 katılımcı · 14 Ağu 2026 12:23</div>
-</a>
-
-  <footer class="foot">
-    <p>Çekilişi herkes hesaplar, sonucu kimse seçemez.</p>
-    <p><a href="https://github.com/kek0000-cybe/openpick" rel="noopener">Kaynak kodu açık</a> · GitHub üzerinden issue açabilirsin</p>
-  </footer>
+<a class="kart hrk-sirali" style="--sira: 2" href="1900000000000000001/">
+  <div class="kart-bas"><span class="kart-baslik">DEMO — sonuclanmis ornek cekilis</span><span class="rozet iyi"><span class="rozet-nokta"></span>sonuçlandı</span></div>
+  <div class="kart-alt">180 katılımcı · 14 Ağu 2026 12:23</div>
+</a></div>
 </main>
+
+<footer class="dip">
+  <p><strong style="color: var(--c-text-2)">Çekilişi herkes hesaplar, sonucu kimse seçemez.</strong></p>
+  <p>Kaynak kodu açık ve sonuçlar bağımsız doğrulanabilir —
+    <a href="https://github.com/kek0000-cybe/openpick" rel="noopener">depoyu incele</a>. GitHub üzerinden issue açabilirsin</p>
+</footer>
+
+<script>
+const t = document.getElementById('tema');
+const uygula = (v) => { document.body.dataset.theme = v; try { localStorage.setItem('tema', v); } catch (e) {} };
+try { uygula(localStorage.getItem('tema') || 'dark'); } catch (e) {}
+t.addEventListener('click', () => uygula(document.body.dataset.theme === 'dark' ? 'light' : 'dark'));
+</script>
 </body>
 </html>

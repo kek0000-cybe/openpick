@@ -17,115 +17,124 @@
 <meta name="twitter:description" content="Gercek bir odul degil, canli acilisi gostermek icin uretilmis ornek · 95 katılımcı · kanıtlanabilir adil çekiliş">
 <link rel="stylesheet" href="../varlik/site.css">
 </head>
-<body>
-<main>
-  <header class="site-head">
-    <a class="brand" lang="en" href="../">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>
-      openpick
-    </a>
-    <nav class="nav">
-      <a href="../">Çekilişler</a>
-      <a href="../dogrula/">Doğrula</a>
-    </nav>
-  </header>
+<body data-theme="dark">
 
+<header class="serit">
+  <a class="marka" lang="en" href="../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 7v5l3 3"/><path d="M17 2.5 22 5l-2.5 5"/></svg>
+    openpick
+  </a>
+  <nav class="gezinme">
+    <a href="../">Çekilişler</a>
+    <a href="../dogrula/?draw=1900000000000000003">Doğrula</a>
+    <button class="tema-dugme" id="tema" type="button" aria-label="Temayı değiştir">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+    </button>
+  </nav>
+</header>
+
+<main class="kap">
   <h1>DEMO — blok bekleme ornegi</h1>
-  <p class="lead">Gercek bir odul degil, canli acilisi gostermek icin uretilmis ornek · 95 katılımcı · kanıtlanabilir adil çekiliş</p>
+  <p class="giris">Gercek bir odul degil, canli acilisi gostermek icin uretilmis ornek · 95 katılımcı · kanıtlanabilir adil çekiliş</p>
 
-  <div class="panel">
-    <div class="panel-head">
-      <span class="panel-title">Çekiliş</span>
-      <span class="badge">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+  <div class="duzlem">
+    <div class="duzlem-bas">
+      <span class="duzlem-baslik" id="evre-ad">Çekiliş</span>
+      <span class="rozet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
         Kanıtlanabilir adil
       </span>
     </div>
-    <div class="panel-body">
+    <div class="duzlem-govde">
 
       <div data-phase="acik kilitli">
-        <div class="count-label" id="clock-label">Çekilişe kalan süre</div>
-        <div class="clock" id="clock">
-          <div class="clock-unit"><div class="clock-num">--</div><div class="clock-cap">saat</div></div>
-          <div class="clock-sep">:</div>
-          <div class="clock-unit"><div class="clock-num">--</div><div class="clock-cap">dakika</div></div>
-          <div class="clock-sep">:</div>
-          <div class="clock-unit"><div class="clock-num">--</div><div class="clock-cap">saniye</div></div>
+        <div class="sayac-etiket">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          Çekilişe kalan süre
         </div>
-      </div>
-
-      <div data-phase="acik kilitli">
-        <div class="strip"><div class="tile"><img src="avatar/bekleyen_0.svg" alt="" loading="lazy"></div><div class="tile"><img src="avatar/bekleyen_1.svg" alt="" loading="lazy"></div><div class="tile"><img src="avatar/bekleyen_2.svg" alt="" loading="lazy"></div><div class="tile"><img src="avatar/bekleyen_3.svg" alt="" loading="lazy"></div><div class="tile"><img src="avatar/bekleyen_4.svg" alt="" loading="lazy"></div><div class="tile"><img src="avatar/bekleyen_5.svg" alt="" loading="lazy"></div><div class="tile"><img src="avatar/bekleyen_6.svg" alt="" loading="lazy"></div><div class="tile"><img src="avatar/bekleyen_7.svg" alt="" loading="lazy"></div><div class="tile"><img src="avatar/bekleyen_8.svg" alt="" loading="lazy"></div><div class="tile"><img src="avatar/bekleyen_9.svg" alt="" loading="lazy"></div><div class="tile"><img src="avatar/bekleyen_10.svg" alt="" loading="lazy"></div><div class="tile"><img src="avatar/bekleyen_11.svg" alt="" loading="lazy"></div><div class="tile"><img src="avatar/bekleyen_12.svg" alt="" loading="lazy"></div><div class="tile"><img src="avatar/bekleyen_13.svg" alt="" loading="lazy"></div><div class="tile"><img src="avatar/bekleyen_14.svg" alt="" loading="lazy"></div><div class="tile more">?</div></div>
-        <div class="entrants"><strong>95</strong> katılımcı onaylandı · son güncelleme 14 Ağu 2026 12:23</div>
+        <div class="saat" id="clock">
+          <div class="saat-birim"><div class="saat-sayi">--</div><div class="saat-ad">saat</div></div>
+          <div class="saat-ayrac">:</div>
+          <div class="saat-birim"><div class="saat-sayi">--</div><div class="saat-ad">dakika</div></div>
+          <div class="saat-ayrac">:</div>
+          <div class="saat-birim"><div class="saat-sayi">--</div><div class="saat-ad">saniye</div></div>
+        </div>
+        <div class="serit-avatar"><div class="karo"><img src="avatar/bekleyen_0.svg" alt="" loading="lazy"></div><div class="karo"><img src="avatar/bekleyen_1.svg" alt="" loading="lazy"></div><div class="karo"><img src="avatar/bekleyen_2.svg" alt="" loading="lazy"></div><div class="karo"><img src="avatar/bekleyen_3.svg" alt="" loading="lazy"></div><div class="karo"><img src="avatar/bekleyen_4.svg" alt="" loading="lazy"></div><div class="karo"><img src="avatar/bekleyen_5.svg" alt="" loading="lazy"></div><div class="karo"><img src="avatar/bekleyen_6.svg" alt="" loading="lazy"></div><div class="karo"><img src="avatar/bekleyen_7.svg" alt="" loading="lazy"></div><div class="karo"><img src="avatar/bekleyen_8.svg" alt="" loading="lazy"></div><div class="karo"><img src="avatar/bekleyen_9.svg" alt="" loading="lazy"></div><div class="karo"><img src="avatar/bekleyen_10.svg" alt="" loading="lazy"></div><div class="karo"><img src="avatar/bekleyen_11.svg" alt="" loading="lazy"></div><div class="karo"><img src="avatar/bekleyen_12.svg" alt="" loading="lazy"></div><div class="karo"><img src="avatar/bekleyen_13.svg" alt="" loading="lazy"></div><div class="karo"><img src="avatar/bekleyen_14.svg" alt="" loading="lazy"></div><div class="karo artan">?</div></div>
+        <div class="katilimci-sayi"><strong>95</strong> katılımcı onaylandı · son güncelleme 14 Ağu 2026 12:36</div>
       </div>
 
       <div data-phase="blok-bekleniyor">
-        <div class="count-label">Bitcoin bloğu bekleniyor</div>
-        <p class="center muted" id="watch-status">Hedef blok sorgulanıyor...</p>
-        <p class="center dim">Tohum, 962405 numaralı bloğun hash'inden türetilecek.
+        <div class="sayac-etiket">
+          <svg class="hrk-donuyor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
+          Bitcoin bloğu bekleniyor
+        </div>
+        <p class="orta ikincil" id="watch-status">Hedef blok sorgulanıyor…</p>
+        <p class="orta ucuncul">Tohum, 962405 numaralı bloğun hash'inden türetilecek.
           Bu blok henüz kazılmadı — sonucu şu an kimse bilemez.</p>
-        <div class="center"><button id="watch-retry" class="hidden">Tekrar dene</button></div>
+        <div class="orta"><button id="watch-retry" class="dugme gizli" type="button">Tekrar dene</button></div>
       </div>
 
       <div data-phase="sonuclandi">
-        <div class="notice ok hidden" id="live-banner">
+        <div class="uyari iyi gizli" id="live-banner">
           Bu sonucu senin tarayıcın hesapladı — sunucudan hazır gelmedi.
         </div>
-        <h3>Kazananlar</h3>
-        <div id="winners"></div>
-        <div id="backups-section" class="hidden">
-          <h3>Yedekler</h3>
-          <div id="backups"></div>
+        <h3 style="margin-bottom: var(--sp-5)">Kazananlar</h3>
+        <div class="kazananlar" id="winners"></div>
+        <div id="backups-section" class="gizli">
+          <h3 style="margin: var(--sp-7) 0 var(--sp-5)">Yedekler</h3>
+          <div class="kazananlar" id="backups"></div>
         </div>
       </div>
 
     </div>
   </div>
 
-  <div class="panel">
-    <div class="panel-head"><span class="panel-title">Kanıt</span></div>
-    <div class="panel-body">
-      <div class="facts">
-        <div class="fact"><div class="fact-k">Çekiliş tweeti</div>
-          <div class="fact-v plain"><a href="https://x.com/ornek/status/1900000000000000003" rel="noopener nofollow">X'te aç</a></div></div>
+  <div class="duzlem">
+    <div class="duzlem-bas"><span class="duzlem-baslik">Kanıt zinciri</span></div>
+    <div class="duzlem-govde">
+      <div class="bilgiler">
+        <div class="bilgi"><div class="bilgi-ad">Çekiliş tweeti</div>
+          <div class="bilgi-deger duz"><a href="https://x.com/ornek/status/1900000000000000003" rel="noopener nofollow">X'te aç</a></div></div>
         
-        <div class="fact"><div class="fact-k">Katılımcı sayısı</div>
-          <div class="fact-v plain">95 kişi (2 eleme)</div></div>
-        <div class="fact"><div class="fact-k">Liste özeti (SHA-256)</div>
-          <div class="fact-v">5441694f29e220a3169d01ed1ed1b52806b62c93a6fcdeb7519ff2b8a9117052</div></div>
-        <div class="fact"><div class="fact-k">Bitcoin bloğu</div>
-          <div class="fact-v plain"><a href="https://blockstream.info/block-height/962405" rel="noopener">962405</a></div></div>
-        <div class="fact"><div class="fact-k">Blok hash</div>
-          <div class="fact-v" id="f-blockhash">—</div></div>
-        <div class="fact"><div class="fact-k">Tohum</div>
-          <div class="fact-v" id="f-seed">—</div></div>
+        <div class="bilgi"><div class="bilgi-ad">Katılımcı</div>
+          <div class="bilgi-deger duz">95 kişi · 2 eleme</div></div>
+        <div class="bilgi"><div class="bilgi-ad">Liste özeti (SHA-256)</div>
+          <div class="bilgi-deger">5441694f29e220a3169d01ed1ed1b52806b62c93a6fcdeb7519ff2b8a9117052</div></div>
+        <div class="bilgi"><div class="bilgi-ad">Bitcoin bloğu</div>
+          <div class="bilgi-deger duz"><a href="https://blockstream.info/block-height/962405" rel="noopener">962405</a></div></div>
+        <div class="bilgi"><div class="bilgi-ad">Blok hash</div>
+          <div class="bilgi-deger" id="f-blockhash">—</div></div>
+        <div class="bilgi"><div class="bilgi-ad">Tohum</div>
+          <div class="bilgi-deger" id="f-seed">—</div></div>
       </div>
-      <div class="controls">
-        <a class="btn" href="../dogrula/?draw=1900000000000000003">Bağımsız doğrula</a>
-        <a class="btn" href="katilimcilar.txt">Katılımcı listesi</a>
-        <a class="btn" href="cekilis.json">Ham veri</a>
+      <div class="dugmeler">
+        <a class="dugme ana" href="../dogrula/?draw=1900000000000000003">Bağımsız doğrula</a>
+        <a class="dugme" href="katilimcilar.txt">Katılımcı listesi</a>
+        <a class="dugme" href="cekilis.json">Ham veri</a>
+        <a class="dugme" href="elenenler.json">Elenenler</a>
       </div>
     </div>
   </div>
 
-  <div class="panel" data-phase="sonuclandi">
-    <div class="panel-head"><span class="panel-title">Seçim matematiği</span></div>
-    <div class="panel-body">
-      <p class="dim">Her tur aşağıda yeniden hesaplanıyor. Sayfa kayıtlı değeri
-        göstermekle kalmıyor, tohumdan yola çıkıp aynı sonucu kendi üretip karşılaştırıyor.</p>
-      <div class="steps" id="steps"></div>
+  <div class="duzlem" data-phase="sonuclandi">
+    <div class="duzlem-bas"><span class="duzlem-baslik">Seçim matematiği</span></div>
+    <div class="duzlem-govde">
+      <p class="ucuncul" style="margin-bottom: var(--sp-6)">Her tur aşağıda yeniden
+        hesaplanıyor. Sayfa kayıtlı değeri göstermekle kalmıyor; tohumdan yola çıkıp aynı
+        sonucu kendi üretip karşılaştırıyor.</p>
+      <div class="adimlar" id="steps"></div>
     </div>
   </div>
-
-  <footer class="foot">
-    <p>Kazananlar, taahhüt edilen listenin özeti ile önceden ilan edilmiş bir Bitcoin
-      bloğunun hash'inden türetilir. Liste kilitlendikten sonra değiştirilemez, blok
-      kazılmadan önce sonuç bilinemez.</p>
-    <p><a href="https://github.com/kek0000-cybe/openpick" rel="noopener">Kaynak kodu</a> · Listeden çıkarılma talepleri için GitHub üzerinden issue açabilirsin</p>
-  </footer>
 </main>
 
-<script>window.__CEKILIS__ = {"tweetId":"1900000000000000003","tweetUrl":"https://x.com/ornek/status/1900000000000000003","title":"DEMO — blok bekleme ornegi","prize":"Gercek bir odul degil, canli acilisi gostermek icin uretilmis ornek","committedAt":"2026-08-14T07:23:37.470Z","drawAt":"2026-08-14T09:22:37.470Z","drawnAt":null,"publishedAt":"2026-08-14T09:23:37.536Z","participantCount":95,"rejectedCount":2,"filters":{"mustHaveAvatar":true,"minTweets":100,"minAccountAgeDays":30},"commit":"5441694f29e220a3169d01ed1ed1b52806b62c93a6fcdeb7519ff2b8a9117052","commitTweetUrl":null,"winnerCount":1,"backupCount":0,"bitcoin":{"tipAtCommit":962403,"targetHeight":962405,"blockHash":null},"seed":null,"winners":null,"backups":null,"steps":null};</script>
+<footer class="dip">
+  <p>Kazananlar, taahhüt edilen listenin özeti ile önceden ilan edilmiş bir Bitcoin
+    bloğunun hash'inden türetilir. Liste kilitlendikten sonra değiştirilemez; blok
+    kazılmadan önce sonuç bilinemez.</p>
+  <p><a href="https://github.com/kek0000-cybe/openpick" rel="noopener">Kaynak kodu</a> · Listeden çıkarılma talepleri için GitHub üzerinden issue açabilirsin</p>
+</footer>
+
+<script>window.__CEKILIS__ = {"tweetId":"1900000000000000003","tweetUrl":"https://x.com/ornek/status/1900000000000000003","title":"DEMO — blok bekleme ornegi","prize":"Gercek bir odul degil, canli acilisi gostermek icin uretilmis ornek","committedAt":"2026-08-14T07:23:37.470Z","drawAt":"2026-08-14T09:22:37.470Z","drawnAt":null,"publishedAt":"2026-08-14T09:36:49.529Z","participantCount":95,"rejectedCount":2,"filters":{"mustHaveAvatar":true,"minTweets":100,"minAccountAgeDays":30},"commit":"5441694f29e220a3169d01ed1ed1b52806b62c93a6fcdeb7519ff2b8a9117052","commitTweetUrl":null,"winnerCount":1,"backupCount":0,"bitcoin":{"tipAtCommit":962403,"targetHeight":962405,"blockHash":null},"seed":null,"winners":null,"backups":null,"steps":null};</script>
 <script>
 /**
  * Çekiliş motorunun tarayıcı sürümü — src/fairness.js ile BİREBİR aynı sonucu
@@ -320,230 +329,253 @@ async function hashAtHeightConfirmed(height) {
 /*
  * Çekiliş sayfasının davranışı.
  *
- * NOT: Bu dosya publish.js tarafından engine.js ve chain.js ile birlikte
- * TEK bir <script> bloğuna gömülür. Bu yüzden import yazmaz; yukarıdaki iki
- * dosyanın tanımlarını doğrudan kullanır. İsim çakışmasını önlemek için
- * buradaki her şey "p" öneki taşır ya da benzersizdir.
+ * NOT: publish.js bu dosyayı engine.js ve chain.js ile birlikte TEK bir
+ * <script> bloğuna gömer. Bu yüzden import yazmaz; yukarıdaki iki dosyanın
+ * tanımlarını doğrudan kullanır. İsim çakışmasını önlemek için buradaki her
+ * şey "p" öneki taşır.
  */
 const pDraw = window.__CEKILIS__;
 const pEl = (id) => document.getElementById(id);
 const pPad = (n) => String(n).padStart(2, '0');
+const pSleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const pRevealed = { blockHash: null, result: null, confirmedBy: 0 };
+
+const EVRE_ADI = {
+  'acik': 'Katılım açık',
+  'kilitli': 'Katılım kapandı',
+  'blok-bekleniyor': 'Blok bekleniyor',
+  'sonuclandi': 'Sonuçlandı',
+};
 
 function pPhase(now = Date.now()) {
   if (!pDraw.commit) return 'acik';
-  if (pDraw.bitcoin && pDraw.bitcoin.blockHash) return 'sonuclandi';
-  if (pRevealed.blockHash) return 'sonuclandi';
+  if (pDraw.bitcoin?.blockHash || pRevealed.blockHash) return 'sonuclandi';
   if (now < new Date(pDraw.drawAt).getTime()) return 'kilitli';
   return 'blok-bekleniyor';
 }
 
-const pRevealed = { blockHash: null, result: null };
-
 function pShow(phase) {
   for (const node of document.querySelectorAll('[data-phase]')) {
-    node.classList.toggle('hidden', !node.dataset.phase.split(' ').includes(phase));
+    node.classList.toggle('gizli', !node.dataset.phase.split(' ').includes(phase));
   }
+  const ad = pEl('evre-ad');
+  if (ad && EVRE_ADI[phase]) ad.textContent = EVRE_ADI[phase];
 }
 
-/* ---------- Geri sayım ---------- */
-function pTickClock() {
+/* ---------- ikon ---------- */
+function pIkon(d, opts = {}) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', opts.w ?? '2.5');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', d);
+  svg.appendChild(path);
+  return svg;
+}
+const IKON_ONAY = 'M20 6 9 17l-5-5';
+
+/* ---------- geri sayım ---------- */
+function pTick() {
   const phase = pPhase();
   pShow(phase);
 
   const box = pEl('clock');
-  if (!box) return;
-  const targetIso = phase === 'acik' ? pDraw.lockAt || pDraw.drawAt : pDraw.drawAt;
-  if (!targetIso) return;
-
-  let left = Math.max(0, new Date(targetIso).getTime() - Date.now());
-  const s = Math.floor(left / 1000);
-  const parts = [Math.floor(s / 3600), Math.floor((s % 3600) / 60), s % 60];
-  const cells = box.querySelectorAll('.clock-num');
-  if (cells.length === 3) {
-    cells[0].textContent = pPad(parts[0]);
-    cells[1].textContent = pPad(parts[1]);
-    cells[2].textContent = pPad(parts[2]);
+  if (box) {
+    const hedef = phase === 'acik' ? (pDraw.lockAt || pDraw.drawAt) : pDraw.drawAt;
+    if (hedef) {
+      const kalan = Math.max(0, new Date(hedef).getTime() - Date.now());
+      const s = Math.floor(kalan / 1000);
+      const hucre = box.querySelectorAll('.saat-sayi');
+      if (hucre.length === 3) {
+        hucre[0].textContent = pPad(Math.floor(s / 3600));
+        hucre[1].textContent = pPad(Math.floor((s % 3600) / 60));
+        hucre[2].textContent = pPad(s % 60);
+      }
+    }
   }
 
-  if (phase === 'blok-bekleniyor') pStartWatching();
-  if (phase === 'sonuclandi') pRenderResult();
+  if (phase === 'blok-bekleniyor') pIzlemeBaslat();
+  if (phase === 'sonuclandi') pSonucCiz();
 }
 
-/* ---------- Blok bekleme ve canlı açılış ---------- */
-let pWatching = false;
-let pStopAt = 0;
+/* ---------- blok bekleme, canlı açılış ---------- */
+let pIzliyor = false;
+let pDurmaAni = 0;
 
-async function pStartWatching() {
-  if (pWatching) return;
-  pWatching = true;
-  pStopAt = Date.now() + 2 * 60 * 60 * 1000; // 2 saat sonra elle denemeye bırak
-  pWatchLoop();
+function pIzlemeBaslat() {
+  if (pIzliyor) return;
+  pIzliyor = true;
+  pDurmaAni = Date.now() + 2 * 60 * 60 * 1000;
+  pIzlemeDongusu();
 }
 
-async function pWatchLoop() {
+async function pIzlemeDongusu() {
   const height = pDraw.bitcoin.targetHeight;
-  const status = pEl('watch-status');
+  const durum = pEl('watch-status');
 
-  while (Date.now() < pStopAt) {
-    if (document.visibilityState === 'hidden') {
-      await pSleep(5000);
-      continue;
-    }
+  while (Date.now() < pDurmaAni) {
+    if (document.visibilityState === 'hidden') { await pSleep(5000); continue; }
     try {
       const tip = await currentHeight();
-      if (status) {
-        const away = Math.max(0, height - tip);
-        status.textContent = away === 0
-          ? 'Blok kazıldı, sonuç hesaplanıyor...'
-          : `Hedef blok ${height} · şu anki yükseklik ${tip} · yaklaşık ${away * 10} dakika`;
+      if (durum) {
+        const uzak = Math.max(0, height - tip);
+        durum.textContent = uzak === 0
+          ? 'Blok kazıldı, sonuç hesaplanıyor…'
+          : `Hedef blok ${height} · şu anki yükseklik ${tip} · yaklaşık ${uzak * 10} dakika`;
       }
       const { hash, confirmedBy } = await hashAtHeightConfirmed(height);
       if (hash) {
         pRevealed.blockHash = hash;
         pRevealed.confirmedBy = confirmedBy;
-        await pComputeLive(hash);
+        await pCanliHesapla(hash);
         return;
       }
     } catch (err) {
-      if (status) status.textContent = `Blok sorgulanamadı: ${err.message} — tekrar denenecek.`;
+      if (durum) durum.textContent = `Blok sorgulanamadı: ${err.message} — tekrar denenecek.`;
     }
     // Sıçramalı bekleme: yüzlerce ziyaretçi aynı anda ücretsiz API'yi dövmesin.
     await pSleep(20000 + Math.random() * 20000);
   }
-  const retry = pEl('watch-retry');
-  if (retry) retry.classList.remove('hidden');
-  pWatching = false;
+  pEl('watch-retry')?.classList.remove('gizli');
+  pIzliyor = false;
 }
 
-const pSleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-async function pComputeLive(blockHash) {
-  const list = await fetch('katilimcilar.txt').then((r) => r.text());
-  const handles = list.split('\n').filter(Boolean);
-  const out = await runDraw({
-    handles,
+async function pCanliHesapla(blockHash) {
+  const liste = await fetch('katilimcilar.txt').then((r) => r.text());
+  pRevealed.result = await runDraw({
+    handles: liste.split('\n').filter(Boolean),
     blockHash,
     winnerCount: pDraw.winnerCount,
     backupCount: pDraw.backupCount,
     commit: pDraw.commit,
   });
-  pRevealed.result = out;
   pShow('sonuclandi');
-  const banner = pEl('live-banner');
-  if (banner) banner.classList.remove('hidden');
-  pRenderResult();
+  pEl('live-banner')?.classList.remove('gizli');
+  pSonucCiz();
 }
 
-/* ---------- Sonuç ---------- */
-let pRendered = false;
+/* ---------- sonuç ---------- */
+let pCizildi = false;
 
-async function pRenderResult() {
-  if (pRendered) return;
-  pRendered = true;
+async function pSonucCiz() {
+  if (pCizildi) return;
+  pCizildi = true;
 
-  const data = pRevealed.result
+  const d = pRevealed.result
     ? { ...pDraw, ...pRevealed.result, bitcoin: { ...pDraw.bitcoin, blockHash: pRevealed.blockHash } }
     : pDraw;
 
   const bh = pEl('f-blockhash');
-  if (bh) bh.textContent = data.bitcoin.blockHash || '—';
+  if (bh) bh.textContent = d.bitcoin?.blockHash || '—';
   const sd = pEl('f-seed');
-  if (sd) sd.textContent = data.seed || '—';
+  if (sd) sd.textContent = d.seed || '—';
 
-  const wbox = pEl('winners');
-  if (wbox && data.winners) {
-    wbox.innerHTML = '';
-    data.winners.forEach((h, i) => wbox.appendChild(pWinnerRow(i + 1, h, true)));
-    const bbox = pEl('backups');
-    if (bbox && data.backups && data.backups.length) {
-      bbox.innerHTML = '';
-      data.backups.forEach((h, i) => bbox.appendChild(pWinnerRow(i + 1, h, false)));
-      const bs = pEl('backups-section');
-      if (bs) bs.classList.remove('hidden');
+  const kutu = pEl('winners');
+  if (kutu && d.winners) {
+    kutu.replaceChildren(...d.winners.map((h, i) => pKazananSatir(i + 1, h, true)));
+    if (d.backups?.length) {
+      pEl('backups')?.replaceChildren(...d.backups.map((h, i) => pKazananSatir(i + 1, h, false)));
+      pEl('backups-section')?.classList.remove('gizli');
     }
   }
-  if (data.steps && data.seed) await pAnimateSteps(data.steps, data.seed);
+  if (d.steps && d.seed) await pAdimlariCiz(d.steps, d.seed);
 }
 
-function pWinnerRow(rank, handle, isWinner) {
+function pKazananSatir(sira, handle, kazanan) {
   const row = document.createElement('div');
-  row.className = 'winner' + (isWinner ? ' top' : '');
-  const r = document.createElement('span');
-  r.className = 'winner-rank';
-  r.textContent = rank + '.';
-  const h = document.createElement('a');
-  h.className = 'winner-handle';
-  h.href = 'https://x.com/' + encodeURIComponent(handle);
-  h.rel = 'noopener nofollow';
-  h.textContent = '@' + handle;
-  const t = document.createElement('span');
-  t.className = 'winner-tag';
-  t.textContent = isWinner ? 'kazanan' : 'yedek';
-  row.append(r, h, t);
+  row.className = 'kazanan' + (kazanan ? ' birinci' : '');
+  const s = document.createElement('span');
+  s.className = 'kazanan-sira';
+  s.textContent = sira;
+  const a = document.createElement('a');
+  a.className = 'kazanan-ad';
+  a.href = 'https://x.com/' + encodeURIComponent(handle);
+  a.rel = 'noopener nofollow';
+  a.textContent = '@' + handle;
+  const e = document.createElement('span');
+  e.className = 'kazanan-etiket';
+  e.textContent = kazanan ? 'kazanan' : 'yedek';
+  row.append(s, a, e);
   return row;
 }
 
-/* ---------- Adım adım matematik ---------- */
-async function pAnimateSteps(steps, seed) {
-  const box = pEl('steps');
-  if (!box) return;
-  box.innerHTML = '';
+/* ---------- adım adım matematik ---------- */
+async function pAdimlariCiz(steps, seed) {
+  const kutu = pEl('steps');
+  if (!kutu) return;
+  kutu.replaceChildren();
   const key = await seedKey(seed);
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const azalt = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   for (const st of steps) {
     // Kayıtlı değeri göstermekle yetinmiyoruz: turu tarayıcıda YENİDEN hesaplayıp
     // kayıtla karşılaştırıyoruz. Animasyon süs değil, canlı kanıt.
-    const again = await drawIndexDetailed(key, st.round, st.remaining);
-    const ok = again.offset === st.offset && again.value === st.value;
+    const tekrar = await drawIndexDetailed(key, st.round, st.remaining);
+    const uygun = tekrar.offset === st.offset && tekrar.value === st.value;
 
     const el = document.createElement('div');
-    el.className = 'step';
-    const head = document.createElement('div');
-    head.className = 'step-head';
-    const round = document.createElement('span');
-    round.className = 'step-round';
-    round.textContent = `Tur ${st.round + 1} · havuzda ${st.remaining} kişi`;
-    const pick = document.createElement('span');
-    pick.className = 'step-pick';
-    pick.textContent = '@' + st.picked;
-    head.append(round, pick);
+    el.className = 'adim';
 
-    const math = document.createElement('div');
-    math.className = 'step-math';
-    math.textContent =
+    const bas = document.createElement('div');
+    bas.className = 'adim-bas';
+    const tur = document.createElement('span');
+    tur.className = 'adim-tur';
+    tur.textContent = `Tur ${st.round + 1} · havuzda ${st.remaining} kişi`;
+    const sec = document.createElement('span');
+    sec.className = 'adim-secilen';
+    sec.textContent = '@' + st.picked;
+    bas.append(tur, sec);
+
+    const mat = document.createElement('div');
+    mat.className = 'adim-mat';
+    mat.textContent =
       `HMAC(tohum, "${st.round}:${st.attempt}") → ilk 6 bayt = ${st.value}\n` +
-      `${st.value} mod ${st.remaining} = ${st.offset} → sıradaki konum ${st.swappedWith}`;
-    math.style.whiteSpace = 'pre-line';
+      `${st.value} mod ${st.remaining} = ${st.offset} → konum ${st.swappedWith}`;
 
-    const check = document.createElement('div');
-    check.className = ok ? 'step-ok' : 'notice bad';
-    check.textContent = ok
-      ? 'bu turu tarayıcın yeniden hesapladı, kayıtla aynı'
-      : 'UYARI: yeniden hesaplama kayıtla uyuşmadı';
+    const onay = document.createElement('div');
+    if (uygun) {
+      onay.className = 'adim-onay';
+      onay.append(pIkon(IKON_ONAY), document.createTextNode('bu turu tarayıcın yeniden hesapladı, kayıtla aynı'));
+    } else {
+      onay.className = 'uyari kotu';
+      onay.textContent = 'UYARI: yeniden hesaplama kayıtla uyuşmadı';
+    }
 
-    el.append(head, math, check);
-    box.appendChild(el);
-    if (reduced) el.classList.add('on');
+    el.append(bas, mat, onay);
+    kutu.appendChild(el);
+    if (azalt) el.classList.add('acik');
     else {
-      await pSleep(420);
-      requestAnimationFrame(() => el.classList.add('on'));
+      await pSleep(380);
+      requestAnimationFrame(() => el.classList.add('acik'));
     }
   }
 }
 
-/* ---------- Başlat ---------- */
-pTickClock();
-setInterval(pTickClock, 1000);
+/* ---------- tema ---------- */
+(() => {
+  const dugme = pEl('tema');
+  const uygula = (v) => {
+    document.body.dataset.theme = v;
+    try { localStorage.setItem('tema', v); } catch (e) { /* özel mod */ }
+  };
+  try { uygula(localStorage.getItem('tema') || 'dark'); } catch (e) { /* özel mod */ }
+  dugme?.addEventListener('click', () =>
+    uygula(document.body.dataset.theme === 'dark' ? 'light' : 'dark'));
+})();
 
-const retryBtn = pEl('watch-retry');
-if (retryBtn) {
-  retryBtn.addEventListener('click', () => {
-    retryBtn.classList.add('hidden');
-    pWatching = false;
-    pStartWatching();
-  });
-}
+/* ---------- başlat ---------- */
+pTick();
+setInterval(pTick, 1000);
+pEl('watch-retry')?.addEventListener('click', (e) => {
+  e.target.classList.add('gizli');
+  pIzliyor = false;
+  pIzlemeBaslat();
+});
 
 </script>
 </body>

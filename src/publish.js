@@ -172,9 +172,9 @@ async function publishDraw(tweetId) {
   const tiles = [];
   for (const u of sample) {
     const rel = await mirrorAvatar(u, path.join(dstDir, 'avatar'));
-    if (rel) tiles.push(`<div class="tile"><img src="${esc(rel)}" alt="" loading="lazy"></div>`);
+    if (rel) tiles.push(`<div class="karo"><img src="${esc(rel)}" alt="" loading="lazy"></div>`);
   }
-  if (pub.participantCount > tiles.length) tiles.push('<div class="tile more">?</div>');
+  if (pub.participantCount > tiles.length) tiles.push('<div class="karo artan">?</div>');
 
   /* 6) Sayfayi uret. */
   const title = pub.title || `Çekiliş ${tweetId}`;
@@ -226,18 +226,18 @@ function publishShared(entries) {
     }), 'utf8');
 
   const cards = entries.length === 0
-    ? '<p class="muted">Henüz yayınlanmış çekiliş yok.</p>'
-    : entries.map((e) => {
+    ? '<p class="ikincil">Henüz yayınlanmış çekiliş yok.</p>'
+    : entries.map((e, i) => {
         const done = Boolean(e.bitcoin.blockHash);
-        const pill = done
-          ? '<span class="pill done">sonuçlandı</span>'
-          : '<span class="pill live">yaklaşan</span>';
+        const rozet = done
+          ? '<span class="rozet iyi"><span class="rozet-nokta"></span>sonuçlandı</span>'
+          : '<span class="rozet"><span class="rozet-nokta"></span>yaklaşan</span>';
         const meta = done
           ? `${e.participantCount} katılımcı · ${trDate(e.drawnAt || e.drawAt)}`
           : `${e.participantCount} katılımcı · çekiliş ${trDate(e.drawAt)}`;
-        return `<a class="card" href="${esc(e.tweetId)}/">
-  <div class="card-top"><span class="card-title">${esc(e.title || 'Çekiliş ' + e.tweetId)}</span>${pill}</div>
-  <div class="card-meta">${esc(meta)}</div>
+        return `<a class="kart hrk-sirali" style="--sira: ${i}" href="${esc(e.tweetId)}/">
+  <div class="kart-bas"><span class="kart-baslik">${esc(e.title || 'Çekiliş ' + e.tweetId)}</span>${rozet}</div>
+  <div class="kart-alt">${esc(meta)}</div>
 </a>`;
       }).join('\n');
 

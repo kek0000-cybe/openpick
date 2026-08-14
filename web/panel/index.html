@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yönetim paneli — openpick</title>
+<link rel="stylesheet" href="/site.css">
+<style>
+  .adimlar-serit { display: flex; gap: 0; border: var(--hair) solid var(--c-line-3);
+    border-radius: var(--r-3); overflow: hidden; margin-bottom: var(--sp-7); }
+  .adim-sekme { flex: 1; padding: var(--sp-5) var(--sp-6); text-align: center;
+    background: var(--c-surface-2); color: var(--c-text-3); font-size: var(--fs-3);
+    font-weight: var(--fw-med); border: 0; border-right: var(--hair) solid var(--c-line-2);
+    cursor: pointer; transition: background var(--dur-2) var(--ease-duz), color var(--dur-2) var(--ease-duz); }
+  .adim-sekme:last-child { border-right: 0; }
+  .adim-sekme[aria-selected="true"] { background: var(--c-accent-fill); color: var(--c-accent-ink); font-weight: var(--fw-str); }
+  .adim-sekme:disabled { opacity: .45; cursor: default; }
+  .kayit { font-family: var(--ff-num); font-size: var(--fs-2); line-height: 1.6;
+    background: var(--c-surface-3); border: var(--hair) solid var(--c-line-2);
+    border-radius: var(--r-2); padding: var(--sp-5); max-height: 320px; overflow: auto;
+    white-space: pre-wrap; word-break: break-word; color: var(--c-text-2); margin-top: var(--sp-6); }
+  .onay { display: flex; align-items: center; gap: var(--sp-4); margin-bottom: var(--sp-4);
+    font-size: var(--fs-3); color: var(--c-text-2); cursor: pointer; }
+  .onay input { width: auto; margin: 0; }
+  .ikili { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-6); }
+  @media (max-width: 640px) { .ikili { grid-template-columns: 1fr; } }
+  .durum-satir { display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-4) 0;
+    border-bottom: var(--hair) solid var(--c-line); font-size: var(--fs-3); color: var(--c-text-2); }
+  .durum-satir:last-child { border-bottom: 0; }
+  .durum-nokta { width: 8px; height: 8px; border-radius: var(--r-dot); background: var(--c-line-3); flex-shrink: 0; }
+  .durum-satir.tamam .durum-nokta { background: var(--c-ok-text); }
+  .durum-satir.tamam { color: var(--c-text); }
+</style>
+</head>
+<body data-theme="dark">
+
+<header class="serit">
+  <span class="marka" lang="en">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 7v5l3 3"/><path d="M17 2.5 22 5l-2.5 5"/></svg>
+    openpick
+  </span>
+  <nav class="gezinme">
+    <span class="rozet notr">yerel panel</span>
+    <button class="tema-dugme" id="tema" type="button" aria-label="Temayı değiştir">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+    </button>
+  </nav>
+</header>
+
+<main class="kap">
+  <h1>Çekiliş yönetimi</h1>
+  <p class="giris">Tweet linkini yapıştır, katılımcıları topla, taahhüt et ve çekilişi yap.
+    Bu panel yalnızca senin bilgisayarında çalışır; herkese açık siteye dahil değildir.</p>
+
+  <div class="adimlar-serit" role="tablist">
+    <button class="adim-sekme" role="tab" aria-selected="true" data-adim="1">1 · Seçenekler</button>
+    <button class="adim-sekme" role="tab" aria-selected="false" data-adim="2">2 · Katılımcılar</button>
+    <button class="adim-sekme" role="tab" aria-selected="false" data-adim="3">3 · Çekiliş</button>
+  </div>
+
+  <!-- ADIM 1 -->
+  <section data-panel="1">
+    <div class="duzlem">
+      <div class="duzlem-bas"><span class="duzlem-baslik">Çekiliş tweeti</span></div>
+      <div class="duzlem-govde">
+        <div class="alan">
+          <label for="url">Tweet linki <span class="ipucu">— örn. https://x.com/kullanici/status/123…</span></label>
+          <input id="url" placeholder="https://x.com/…/status/…">
+        </div>
+        <div class="ikili">
+          <div class="alan"><label for="title">Başlık <span class="ipucu">(sitede görünür)</span></label>
+            <input id="title" placeholder="Örn. PS5 çekilişi"></div>
+          <div class="alan"><label for="prize">Ödül</label>
+            <input id="prize" placeholder="Örn. 1 adet PlayStation 5"></div>
+        </div>
+        <div class="ikili">
+          <div class="alan"><label for="drawAt">Çekiliş zamanı <span class="ipucu">(geri sayım buna işler)</span></label>
+            <input id="drawAt" type="datetime-local"></div>
+          <div class="alan"><label for="winners">Kazanan / yedek sayısı</label>
+            <div class="satir" style="margin:0">
+              <div><input id="winners" type="number" min="1" value="1"></div>
+              <div><input id="backups" type="number" min="0" value="2"></div>
+            </div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="duzlem">
+      <div class="duzlem-bas">
+        <span class="duzlem-baslik">Katılımcı filtreleri</span>
+        <span class="ucuncul">sahte hesapları eler · ek maliyeti yok</span>
+      </div>
+      <div class="duzlem-govde">
+        <div class="ikili">
+          <div>
+            <label class="onay"><input type="checkbox" id="fAvatar" checked> Profil fotoğrafı olsun</label>
+            <label class="onay"><input type="checkbox" id="fBanner"> Kapak görseli olsun</label>
+            <label class="onay"><input type="checkbox" id="fBio"> Biyografi olsun</label>
+            <label class="onay"><input type="checkbox" id="fLoc"> Konum olsun</label>
+          </div>
+          <div>
+            <div class="alan"><label for="minTweets">En az tweet sayısı</label>
+              <select id="minTweets">
+                <option value="0">Sınır yok</option>
+                <option value="10">10+</option>
+                <option value="50">50+</option>
+                <option value="100" selected>100+</option>
+                <option value="500">500+</option>
+              </select></div>
+            <div class="alan"><label for="minAge">En az hesap yaşı</label>
+              <select id="minAge">
+                <option value="0">Sınır yok</option>
+                <option value="7">1 hafta</option>
+                <option value="30" selected>1 ay</option>
+                <option value="180">6 ay</option>
+                <option value="365">1 yıl</option>
+              </select></div>
+          </div>
+        </div>
+        <div class="alan"><label for="exclude">Hariç tutulacak hesaplar <span class="ipucu">(virgülle)</span></label>
+          <input id="exclude" placeholder="@hesap1, @hesap2"></div>
+      </div>
+    </div>
+
+    <div class="dugmeler">
+      <button class="dugme ana" id="ileri1" type="button">Devam et</button>
+      <button class="dugme" id="loginBtn" type="button">X hesabına giriş yap</button>
+    </div>
+  </section>
+
+  <!-- ADIM 2 -->
+  <section data-panel="2" class="gizli">
+    <div class="duzlem">
+      <div class="duzlem-bas"><span class="duzlem-baslik">Katılımcıları topla</span>
+        <span class="ucuncul" id="hedefTweet"></span></div>
+      <div class="duzlem-govde">
+        <div class="ikili">
+          <div>
+            <label class="onay"><input type="checkbox" id="tRt" checked> Retweet edenler</label>
+            <label class="onay"><input type="checkbox" id="tLike"> Beğenenler</label>
+            <label class="onay"><input type="checkbox" id="tSlow"> Yavaş mod <span class="ipucu">(daha güvenli)</span></label>
+          </div>
+          <div class="alan"><label for="max">Üst sınır</label>
+            <input id="max" type="number" min="0" placeholder="boş = sınırsız"></div>
+        </div>
+        <p class="ucuncul">Tarayıcı açılacak ve katılımcılar toplanacak. Uzun süren
+          çekilişlerde bu adımı arada bir tekrarla; yeni katılımcılar eklenir.</p>
+        <div class="dugmeler">
+          <button class="dugme ana" id="topla" type="button">Toplamayı başlat</button>
+          <button class="dugme" id="ileri2" type="button">Taahhüde geç</button>
+        </div>
+        <div class="kayit gizli" id="log2"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADIM 3 -->
+  <section data-panel="3" class="gizli">
+    <div class="duzlem">
+      <div class="duzlem-bas"><span class="duzlem-baslik">Durum</span></div>
+      <div class="duzlem-govde"><div id="durum"></div></div>
+    </div>
+
+    <div class="duzlem">
+      <div class="duzlem-bas"><span class="duzlem-baslik">Sırayla</span></div>
+      <div class="duzlem-govde">
+        <p class="ucuncul">Taahhüt, katılımı kapatır ve listeyi kilitler. Ürettiği tweet
+          metnini yayınla — kanıtın belkemiği o. Sonra blok kazılınca çekilişi yap.</p>
+        <div class="dugmeler">
+          <button class="dugme ana" id="taahhut" type="button">1 · Taahhüt et</button>
+          <button class="dugme" id="cek" type="button">2 · Çekilişi yap</button>
+          <button class="dugme" id="yayinla" type="button">3 · Siteye yayınla</button>
+        </div>
+        <div class="alan" style="margin-top: var(--sp-7)">
+          <label for="commitTweet">Taahhüt tweetinin linki
+            <span class="ipucu">— attıktan sonra yapıştır, tekrar taahhüt et</span></label>
+          <input id="commitTweet" placeholder="https://x.com/…/status/…">
+        </div>
+        <div class="kayit gizli" id="log3"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="dip">
+  <p>Toplama adımı X'in tarayıcı oturumunu kullanır ve kullanım şartlarına aykırıdır;
+    ana hesabın yerine ayrı bir hesap kullanman daha güvenlidir. Site tarafı X'e hiç
+    dokunmaz, risk yalnızca bu adımdadır.</p>
+</footer>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const durum = { tweetId: null };
+
+/* tema */
+const tema = (v) => { document.body.dataset.theme = v; try { localStorage.setItem('tema', v); } catch (e) {} };
+try { tema(localStorage.getItem('tema') || 'dark'); } catch (e) {}
+$('tema').addEventListener('click', () => tema(document.body.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+/* sekmeler */
+function goster(n) {
+  // Sekme tiklamasi metin ("3"), butonlar sayi (3) gonderiyor — once esitle.
+  const adim = String(n);
+  for (const s of document.querySelectorAll('[data-panel]')) s.classList.toggle('gizli', s.dataset.panel !== adim);
+  for (const t of document.querySelectorAll('.adim-sekme')) t.setAttribute('aria-selected', t.dataset.adim === adim);
+  if (adim === '3') durumYenile();
+}
+for (const t of document.querySelectorAll('.adim-sekme')) {
+  t.addEventListener('click', () => { if (durum.tweetId || t.dataset.adim === '1') goster(t.dataset.adim); });
+}
+
+/* is calistirma */
+async function calistir(komut, args, logEl) {
+  const kutu = $(logEl);
+  kutu.classList.remove('gizli');
+  kutu.textContent = 'Başlatılıyor…\n';
+  const r = await fetch('/api/baslat', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ komut, args }),
+  }).then((x) => x.json());
+  if (r.hata) { kutu.textContent = 'Hata: ' + r.hata; return null; }
+
+  while (true) {
+    await new Promise((s) => setTimeout(s, 700));
+    const j = await fetch('/api/job/' + r.jobId).then((x) => x.json());
+    kutu.textContent = j.log || '…';
+    kutu.scrollTop = kutu.scrollHeight;
+    if (j.bitti) { durumYenile(); return j; }
+  }
+}
+
+/* adim 1 → 2 */
+$('ileri1').addEventListener('click', async () => {
+  const url = $('url').value.trim();
+  if (!url) return alert('Tweet linkini gir.');
+  const r = await fetch('/api/cozumle', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ url }),
+  }).then((x) => x.json());
+  if (r.hata) return alert(r.hata);
+  durum.tweetId = r.tweetId;
+  $('hedefTweet').textContent = '@' + r.handle + ' · ' + r.tweetId;
+  goster(2);
+});
+
+$('loginBtn').addEventListener('click', () => calistir('login', {}, 'log2'));
+
+/* adim 2 */
+$('topla').addEventListener('click', () => {
+  const types = [];
+  if ($('tRt').checked) types.push('retweets');
+  if ($('tLike').checked) types.push('likes');
+  if (!types.length) return alert('En az bir kaynak seç.');
+  calistir('collect', {
+    url: $('url').value.trim(), types,
+    max: $('max').value || undefined, slow: $('tSlow').checked,
+  }, 'log2');
+});
+$('ileri2').addEventListener('click', () => goster(3));
+
+/* adim 3 */
+function filtreler() {
+  return {
+    tweetId: durum.tweetId,
+    title: $('title').value.trim() || undefined,
+    prize: $('prize').value.trim() || undefined,
+    drawAt: $('drawAt').value ? new Date($('drawAt').value).toISOString() : undefined,
+    commitTweetUrl: $('commitTweet').value.trim() || undefined,
+    minTweets: +$('minTweets').value || undefined,
+    minAgeDays: +$('minAge').value || undefined,
+    requireBanner: $('fBanner').checked, requireBio: $('fBio').checked,
+    requireLocation: $('fLoc').checked, allowDefaultAvatar: !$('fAvatar').checked,
+    exclude: $('exclude').value.trim() || undefined,
+  };
+}
+$('taahhut').addEventListener('click', () => calistir('commit', filtreler(), 'log3'));
+$('cek').addEventListener('click', () => calistir('draw', {
+  tweetId: durum.tweetId, winners: +$('winners').value || 1, backups: +$('backups').value || 0,
+}, 'log3'));
+$('yayinla').addEventListener('click', () => calistir('publish', { tweetId: durum.tweetId }, 'log3'));
+
+/* durum */
+async function durumYenile() {
+  if (!durum.tweetId) return;
+  const d = await fetch('/api/durum?tweet=' + durum.tweetId).then((x) => x.json());
+  const satir = (tamam, metin) =>
+    `<div class="durum-satir${tamam ? ' tamam' : ''}"><span class="durum-nokta"></span>${metin}</div>`;
+  $('durum').innerHTML =
+    satir(d.toplandi, d.toplandi ? `${d.toplanan} katılımcı toplandı` : 'Katılımcı toplanmadı') +
+    satir(!!d.taahhut, d.taahhut
+      ? `Taahhüt verildi · ${d.taahhut.participantCount} kişi · blok ${d.taahhut.targetHeight}`
+      : 'Taahhüt verilmedi') +
+    satir(!!d.sonuc, d.sonuc
+      ? `Çekiliş yapıldı · kazanan @${d.sonuc.winners[0]}`
+      : 'Çekiliş yapılmadı') +
+    satir(d.yayinda, d.yayinda ? 'Siteye yayınlandı' : 'Siteye yayınlanmadı');
+}
+</script>
+</body>
+</html>
