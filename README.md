@@ -37,7 +37,23 @@ npm install
 npx playwright install chromium
 ```
 
-## Çekiliş akışı
+## Yönetim paneli (en kolay yol)
+
+```bash
+npm run panel
+```
+
+`http://localhost:8090` açılır: tweet linkini yapıştırırsın, filtreleri seçersin ve
+toplama → taahhüt → çekiliş → yayınlama adımlarını düğmelerle yürütürsün.
+
+Panel yalnızca `127.0.0.1` üzerinden erişilebilir, yani ağdaki başka bir cihaz açamaz.
+Çalıştırabildiği komutlar sabit bir listede ve argümanlar dizi olarak geçirilir (kabuk
+kullanılmaz), dolayısıyla komut enjeksiyonu mümkün değildir. Herkese açık siteye dahil
+edilmez.
+
+Aşağıdaki komutlar aynı işi terminalden yapar; panel sadece bunları çağırır.
+
+## Çekiliş akışı (komut satırı)
 
 ### 1. Bir kereliğine giriş
 
@@ -133,4 +149,7 @@ doğrulayıcı bizim hile yaptığımız sonucuna varır.
 | `src/commit.js` | Katılımı kapatır, taahhüt metnini üretir |
 | `src/draw.js` | Blok hash'ini alır, kazananları belirler |
 | `src/publish.js` | `docs/` altındaki statik siteyi üretir |
+| `src/panel.js` | Yerel yönetim paneli sunucusu (sadece 127.0.0.1) |
+| `web/assets/site.css` | 6Q Community tasarım sistemi tokenları |
+| `web/templates/` | Sayfa şablonları — tasarımı buradan düzenle |
 | `docs/` | Üretilen site — elle düzenleme, `web/` altını düzenle |
