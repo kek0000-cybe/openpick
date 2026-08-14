@@ -1,0 +1,142 @@
+{
+  "tweetId": "2087486754647359635",
+  "tweetUrl": "https://x.com/Stake/status/2087486754647359635",
+  "title": "TEST - Stake cekilisi verisiyle sistem denemesi",
+  "prize": "Odul yok. Bu bir sistem testidir, gercek bir cekilis degildir.",
+  "committedAt": "2026-08-14T11:46:58.472Z",
+  "drawAt": "2026-08-14T11:47:57.000Z",
+  "drawnAt": "2026-08-14T11:47:59.514Z",
+  "publishedAt": "2026-08-14T11:47:59.578Z",
+  "participantCount": 6260,
+  "rejectedCount": 171,
+  "filters": {
+    "mustHaveAvatar": true,
+    "mustHaveBanner": false,
+    "mustHaveDescription": false,
+    "mustHaveLocation": false,
+    "minTweets": 0,
+    "minAccountAgeDays": 0,
+    "excludeHandles": []
+  },
+  "commit": "6f7f9984b2ad3ecf1a945f932554c5fbdedaae223fd0fcb6d8be49e74de98198",
+  "commitTweetUrl": null,
+  "winnerCount": 5,
+  "backupCount": 5,
+  "randomness": {
+    "source": "drand",
+    "round": 31301571,
+    "chain": "52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971",
+    "roundAt": "2026-08-14T11:47:57.000Z",
+    "tipAtCommit": null,
+    "targetHeight": null,
+    "value": "51838eb4218f50348ccfca6a7dd5c30691247f6d063abab4f06d3f2d60e8fda8",
+    "confirmedBy": 2
+  },
+  "seed": "e01f57963e249d11cf65ff7a564c173de286e486a253d0fd440336d82cf99b20",
+  "winners": [
+    "joy5take",
+    "turiklab",
+    "grind_cru",
+    "tsk160",
+    "cirechandan"
+  ],
+  "backups": [
+    "k_leel_x",
+    "firstrayaa",
+    "serk4nfb",
+    "kelpopuff",
+    "groups17946"
+  ],
+  "steps": [
+    {
+      "round": 0,
+      "remaining": 6260,
+      "value": 55672668183859,
+      "attempt": 0,
+      "offset": 2879,
+      "swappedWith": 2879,
+      "picked": "joy5take"
+    },
+    {
+      "round": 1,
+      "remaining": 6259,
+      "value": 113227268064953,
+      "attempt": 0,
+      "offset": 5652,
+      "swappedWith": 5653,
+      "picked": "turiklab"
+    },
+    {
+      "round": 2,
+      "remaining": 6258,
+      "value": 129449439246909,
+      "attempt": 0,
+      "offset": 2259,
+      "swappedWith": 2261,
+      "picked": "grind_cru"
+    },
+    {
+      "round": 3,
+      "remaining": 6257,
+      "value": 155972017438998,
+      "attempt": 0,
+      "offset": 5637,
+      "swappedWith": 5640,
+      "picked": "tsk160"
+    },
+    {
+      "round": 4,
+      "remaining": 6256,
+      "value": 247433722164547,
+      "attempt": 0,
+      "offset": 1235,
+      "swappedWith": 1239,
+      "picked": "cirechandan"
+    },
+    {
+      "round": 5,
+      "remaining": 6255,
+      "value": 131475708811529,
+      "attempt": 0,
+      "offset": 2924,
+      "swappedWith": 2929,
+      "picked": "k_leel_x"
+    },
+    {
+      "round": 6,
+      "remaining": 6254,
+      "value": 35920144053233,
+      "attempt": 0,
+      "offset": 2021,
+      "swappedWith": 2027,
+      "picked": "firstrayaa"
+    },
+    {
+      "round": 7,
+      "remaining": 6253,
+      "value": 40904978512159,
+      "attempt": 0,
+      "offset": 4961,
+      "swappedWith": 4968,
+      "picked": "serk4nfb"
+    },
+    {
+      "round": 8,
+      "remaining": 6252,
+      "value": 231899148966807,
+      "attempt": 0,
+      "offset": 3015,
+      "swappedWith": 3023,
+      "picked": "kelpopuff"
+    },
+    {
+      "round": 9,
+      "remaining": 6251,
+      "value": 131941665466565,
+      "attempt": 0,
+      "offset": 2257,
+      "swappedWith": 2266,
+      "picked": "groups17946"
+    }
+  ]
+}
