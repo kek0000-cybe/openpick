@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}} — {{SITE_NAME}}</title>
+<meta name="description" content="{{DESC}}">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://blockstream.info https://mempool.emzy.de https://mempool.space">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:site_name" content="{{SITE_NAME}}">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="{{DESC}}">
+<meta property="og:url" content="{{PAGE_URL}}">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{TITLE}}">
+<meta name="twitter:description" content="{{DESC}}">
+<link rel="stylesheet" href="../varlik/site.css">
+</head>
+<body>
+<main>
+  <header class="site-head">
+    <a class="brand" lang="en" href="../">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>
+      {{SITE_NAME}}
+    </a>
+    <nav class="nav">
+      <a href="../">Çekilişler</a>
+      <a href="../dogrula/">Doğrula</a>
+    </nav>
+  </header>
+
+  <h1>{{TITLE}}</h1>
+  <p class="lead">{{DESC}}</p>
+
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-title">Çekiliş</span>
+      <span class="badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        Kanıtlanabilir adil
+      </span>
+    </div>
+    <div class="panel-body">
+
+      <div data-phase="acik kilitli">
+        <div class="count-label" id="clock-label">Çekilişe kalan süre</div>
+        <div class="clock" id="clock">
+          <div class="clock-unit"><div class="clock-num">--</div><div class="clock-cap">saat</div></div>
+          <div class="clock-sep">:</div>
+          <div class="clock-unit"><div class="clock-num">--</div><div class="clock-cap">dakika</div></div>
+          <div class="clock-sep">:</div>
+          <div class="clock-unit"><div class="clock-num">--</div><div class="clock-cap">saniye</div></div>
+        </div>
+      </div>
+
+      <div data-phase="acik kilitli">
+        <div class="strip">{{TILES}}</div>
+        <div class="entrants"><strong>{{COUNT}}</strong> katılımcı onaylandı{{AS_OF}}</div>
+      </div>
+
+      <div data-phase="blok-bekleniyor">
+        <div class="count-label">Bitcoin bloğu bekleniyor</div>
+        <p class="center muted" id="watch-status">Hedef blok sorgulanıyor...</p>
+        <p class="center dim">Tohum, {{TARGET_HEIGHT}} numaralı bloğun hash'inden türetilecek.
+          Bu blok henüz kazılmadı — sonucu şu an kimse bilemez.</p>
+        <div class="center"><button id="watch-retry" class="hidden">Tekrar dene</button></div>
+      </div>
+
+      <div data-phase="sonuclandi">
+        <div class="notice ok hidden" id="live-banner">
+          Bu sonucu senin tarayıcın hesapladı — sunucudan hazır gelmedi.
+        </div>
+        <h3>Kazananlar</h3>
+        <div id="winners"></div>
+        <div id="backups-section" class="hidden">
+          <h3>Yedekler</h3>
+          <div id="backups"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span class="panel-title">Kanıt</span></div>
+    <div class="panel-body">
+      <div class="facts">
+        <div class="fact"><div class="fact-k">Çekiliş tweeti</div>
+          <div class="fact-v plain"><a href="{{TWEET_URL}}" rel="noopener nofollow">X'te aç</a></div></div>
+        {{COMMIT_TWEET_ROW}}
+        <div class="fact"><div class="fact-k">Katılımcı sayısı</div>
+          <div class="fact-v plain">{{COUNT}} kişi ({{REJECTED}} eleme)</div></div>
+        <div class="fact"><div class="fact-k">Liste özeti (SHA-256)</div>
+          <div class="fact-v">{{COMMIT}}</div></div>
+        <div class="fact"><div class="fact-k">Bitcoin bloğu</div>
+          <div class="fact-v plain"><a href="https://blockstream.info/block-height/{{TARGET_HEIGHT}}" rel="noopener">{{TARGET_HEIGHT}}</a></div></div>
+        <div class="fact"><div class="fact-k">Blok hash</div>
+          <div class="fact-v" id="f-blockhash">—</div></div>
+        <div class="fact"><div class="fact-k">Tohum</div>
+          <div class="fact-v" id="f-seed">—</div></div>
+      </div>
+      <div class="controls">
+        <a class="btn" href="../dogrula/?draw={{TWEET_ID}}">Bağımsız doğrula</a>
+        <a class="btn" href="katilimcilar.txt">Katılımcı listesi</a>
+        <a class="btn" href="cekilis.json">Ham veri</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" data-phase="sonuclandi">
+    <div class="panel-head"><span class="panel-title">Seçim matematiği</span></div>
+    <div class="panel-body">
+      <p class="dim">Her tur aşağıda yeniden hesaplanıyor. Sayfa kayıtlı değeri
+        göstermekle kalmıyor, tohumdan yola çıkıp aynı sonucu kendi üretip karşılaştırıyor.</p>
+      <div class="steps" id="steps"></div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <p>Kazananlar, taahhüt edilen listenin özeti ile önceden ilan edilmiş bir Bitcoin
+      bloğunun hash'inden türetilir. Liste kilitlendikten sonra değiştirilemez, blok
+      kazılmadan önce sonuç bilinemez.</p>
+    <p><a href="{{REPO_URL}}" rel="noopener">Kaynak kodu</a> · Listeden çıkarılma talepleri için {{CONTACT}}</p>
+  </footer>
+</main>
+
+<script>window.__CEKILIS__ = {{DRAW_JSON}};</script>
+<script>
+{{ENGINE}}
+{{CHAIN}}
+{{PAGE}}
+</script>
+</body>
+</html>

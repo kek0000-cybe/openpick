@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Çekiliş doğrulama — {{SITE_NAME}}</title>
+<meta name="description" content="Kazananları kendi tarayıcında sıfırdan yeniden hesapla.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../varlik/site.css">
+</head>
+<body>
+<main>
+  <header class="site-head">
+    <a class="brand" lang="en" href="../">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>
+      {{SITE_NAME}}
+    </a>
+    <nav class="nav"><a href="../">Çekilişler</a></nav>
+  </header>
+
+  <h1>Çekiliş doğrulama</h1>
+  <p class="lead">
+    Bu sayfa hiçbir sunucuya sonuç sormaz. Kazananları senin tarayıcında sıfırdan
+    hesaplar. Aynı liste ve aynı blok hash'i her zaman aynı kazananları verir — sonuç
+    bizim elimizde değil.
+  </p>
+
+  <div class="notice hidden" id="prefill-note"></div>
+
+  <div class="field">
+    <label for="list">Katılımcı listesi
+      <span class="hint">— çekilişle yayınlanan <code>katilimcilar.txt</code>, her satırda bir kullanıcı</span>
+    </label>
+    <textarea id="list" spellcheck="false" placeholder="ahmet&#10;ayse&#10;mehmet"></textarea>
+  </div>
+
+  <div class="field">
+    <label for="block">Bitcoin blok hash'i
+      <span class="hint">— çekilişten önce ilan edilen blok numarasının hash'i</span>
+    </label>
+    <input id="block" spellcheck="false" placeholder="0000000000000000000...">
+  </div>
+
+  <div class="row">
+    <div><label for="winners">Kazanan sayısı</label><input id="winners" type="number" min="1" value="1"></div>
+    <div><label for="backups">Yedek sayısı</label><input id="backups" type="number" min="0" value="0"></div>
+    <div><label for="expected">Beklenen liste özeti <span class="hint">(isteğe bağlı)</span></label>
+      <input id="expected" spellcheck="false" placeholder="yayınlanan SHA-256"></div>
+  </div>
+
+  <button id="run" class="primary">Kazananları yeniden hesapla</button>
+
+  <div class="hidden" id="out">
+    <h2>Hesaplama adımları</h2>
+    <div class="facts">
+      <div class="fact"><div class="fact-k">1. Katılımcı sayısı</div><div class="fact-v" id="o-count"></div></div>
+      <div class="fact"><div class="fact-k">2. Liste özeti — SHA-256(sıralı liste)</div><div class="fact-v" id="o-commit"></div></div>
+      <div class="fact"><div class="fact-k">3. Blok hash — dış rastgelelik</div><div class="fact-v" id="o-block"></div></div>
+      <div class="fact"><div class="fact-k">4. Tohum — SHA-256(özet : blok hash)</div><div class="fact-v" id="o-seed"></div></div>
+    </div>
+    <h2>Kazananlar</h2>
+    <div id="o-winners"></div>
+    <div id="o-backups"></div>
+    <div id="o-verdict"></div>
+  </div>
+
+  <footer class="foot">
+    <p>Bu sayfanın hesapladığı sonuç, komut satırı aracının hesapladığıyla birebir aynıdır;
+      her sürümde otomatik olarak karşılaştırılır.</p>
+    <p><a href="{{REPO_URL}}" rel="noopener">Kaynak kodu</a></p>
+  </footer>
+</main>
+
+<script>
+{{ENGINE}}
+
+const vEl = (id) => document.getElementById(id);
+
+function vList(handle, rank, tag) {
+  const row = document.createElement('div');
+  row.className = 'winner' + (tag === 'kazanan' ? ' top' : '');
+  const r = document.createElement('span'); r.className = 'winner-rank'; r.textContent = rank + '.';
+  const h = document.createElement('span'); h.className = 'winner-handle'; h.textContent = '@' + handle;
+  const t = document.createElement('span'); t.className = 'winner-tag'; t.textContent = tag;
+  row.append(r, h, t);
+  return row;
+}
+
+async function vRun() {
+  const lines = vEl('list').value.split('\n');
+  const block = vEl('block').value.trim().toLowerCase();
+  const winners = Math.max(1, +vEl('winners').value || 1);
+  const backups = Math.max(0, +vEl('backups').value || 0);
+  const expected = vEl('expected').value.trim().toLowerCase();
+
+  if (canonicalize(lines).length === 0) return alert('Katılımcı listesi boş.');
+  if (!/^[0-9a-f]{64}$/.test(block)) return alert('Blok hash 64 karakterlik onaltılık bir değer olmalı.');
+
+  const r = await runDraw({ handles: lines, blockHash: block, winnerCount: winners, backupCount: backups });
+
+  vEl('o-count').textContent = r.participantCount + ' kişi';
+  vEl('o-commit').textContent = r.commit;
+  vEl('o-block').textContent = block;
+  vEl('o-seed').textContent = r.seed;
+
+  const wb = vEl('o-winners'); wb.innerHTML = '';
+  r.winners.forEach((h, i) => wb.appendChild(vList(h, i + 1, 'kazanan')));
+  const bb = vEl('o-backups'); bb.innerHTML = '';
+  if (r.backups.length) {
+    const t = document.createElement('h2'); t.textContent = 'Yedekler'; bb.appendChild(t);
+    r.backups.forEach((h, i) => bb.appendChild(vList(h, i + 1, 'yedek')));
+  }
+
+  const verdict = vEl('o-verdict');
+  if (expected) {
+    const ok = expected === r.commit;
+    verdict.className = 'notice ' + (ok ? 'ok' : 'bad');
+    verdict.textContent = ok
+      ? 'Liste özeti yayınlanan değerle eşleşiyor — liste çekilişten sonra değiştirilmemiş.'
+      : 'Liste özeti eşleşmiyor. Elindeki liste, taahhüt edilen listeden farklı.';
+  } else {
+    verdict.className = ''; verdict.textContent = '';
+  }
+  vEl('out').classList.remove('hidden');
+}
+
+vEl('run').addEventListener('click', vRun);
+
+/* Bir çekilişten otomatik doldurma. Kimlik katı biçimde doğrulanır;
+   parametre asla doğrudan fetch'e verilmez (yol gezinme açığı olurdu). */
+(async () => {
+  try {
+    if (location.protocol === 'file:') return;
+    const id = new URLSearchParams(location.search).get('draw');
+    if (!id || !/^[0-9]{5,25}$/.test(id)) return;
+    const base = '../' + id + '/';
+    const [meta, list] = await Promise.all([
+      fetch(base + 'cekilis.json').then((r) => r.json()),
+      fetch(base + 'katilimcilar.txt').then((r) => r.text()),
+    ]);
+    vEl('list').value = list;
+    vEl('block').value = (meta.bitcoin && meta.bitcoin.blockHash) || '';
+    vEl('winners').value = (meta.winners || []).length || 1;
+    vEl('backups').value = (meta.backups || []).length || 0;
+    vEl('expected').value = meta.commit || '';
+    const note = vEl('prefill-note');
+    note.textContent = 'Alanlar bu çekilişin yayınlanan verisiyle dolduruldu. İstersen değiştirip tekrar çalıştırabilirsin.';
+    note.classList.remove('hidden');
+    if (vEl('block').value) await vRun();
+  } catch {
+    /* dolduramazsa sayfa elle kullanılmaya devam eder */
+  }
+})();
+</script>
+</body>
+</html>

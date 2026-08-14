@@ -1,0 +1,30 @@
+{
+  "tweetId": "1900000000000000002",
+  "tweetUrl": "https://x.com/ornek/status/1900000000000000002",
+  "title": "DEMO — geri sayim ornegi",
+  "prize": "Gercek bir odul degil, geri sayimi gostermek icin uretilmis ornek",
+  "committedAt": "2026-08-14T09:23:37.468Z",
+  "drawAt": "2026-08-14T10:53:37.468Z",
+  "drawnAt": null,
+  "publishedAt": "2026-08-14T09:23:37.522Z",
+  "participantCount": 420,
+  "rejectedCount": 2,
+  "filters": {
+    "mustHaveAvatar": true,
+    "minTweets": 100,
+    "minAccountAgeDays": 30
+  },
+  "commit": "cce00d0e59a390c2e4da448c06be06de360fb88bc7d6046b307706e0c05ad36a",
+  "commitTweetUrl": null,
+  "winnerCount": 1,
+  "backupCount": 0,
+  "bitcoin": {
+    "tipAtCommit": 962403,
+    "targetHeight": 962412,
+    "blockHash": null
+  },
+  "seed": null,
+  "winners": null,
+  "backups": null,
+  "steps": null
+}

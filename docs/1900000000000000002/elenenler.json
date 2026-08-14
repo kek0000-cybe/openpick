@@ -1,0 +1,10 @@
+[
+  {
+    "handle": "elenen_bir",
+    "reason": "profil fotografi yok"
+  },
+  {
+    "handle": "elenen_iki",
+    "reason": "tweet sayısı yetersiz (< 100)"
+  }
+]

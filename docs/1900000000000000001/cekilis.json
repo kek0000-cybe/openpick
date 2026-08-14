@@ -1,0 +1,83 @@
+{
+  "tweetId": "1900000000000000001",
+  "tweetUrl": "https://x.com/ornek/status/1900000000000000001",
+  "title": "DEMO — sonuclanmis ornek cekilis",
+  "prize": "Gercek bir odul degil, sistemi gostermek icin uretilmis ornek",
+  "committedAt": "2026-08-14T08:23:37.464Z",
+  "drawAt": "2026-08-14T08:53:37.464Z",
+  "drawnAt": "2026-08-14T09:23:37.465Z",
+  "publishedAt": "2026-08-14T09:23:37.513Z",
+  "participantCount": 180,
+  "rejectedCount": 2,
+  "filters": {
+    "mustHaveAvatar": true,
+    "minTweets": 100,
+    "minAccountAgeDays": 30
+  },
+  "commit": "3756281abcfa497e54c01d8a3b1d7a380b3b2e849d3b0c5c2a0edf7cdc2a12d9",
+  "commitTweetUrl": "https://x.com/ornek/status/1900000000000000001",
+  "winnerCount": 3,
+  "backupCount": 2,
+  "bitcoin": {
+    "tipAtCommit": 962393,
+    "targetHeight": 962399,
+    "blockHash": "000000000000000000001aef96daf1bc5601dc76e93f0ebe7551c76d6aa03bb8"
+  },
+  "seed": "d8eab116ad8e9b4dfd296922b446b7227e22b7aab3490c838fa46fac7e33642e",
+  "winners": [
+    "kazanan_57",
+    "kazanan_79",
+    "kazanan_117"
+  ],
+  "backups": [
+    "kazanan_56",
+    "kazanan_82"
+  ],
+  "steps": [
+    {
+      "round": 0,
+      "remaining": 180,
+      "value": 190294972550773,
+      "attempt": 0,
+      "offset": 133,
+      "swappedWith": 133,
+      "picked": "kazanan_57"
+    },
+    {
+      "round": 1,
+      "remaining": 179,
+      "value": 272442512158050,
+      "attempt": 0,
+      "offset": 156,
+      "swappedWith": 157,
+      "picked": "kazanan_79"
+    },
+    {
+      "round": 2,
+      "remaining": 178,
+      "value": 138018519977373,
+      "attempt": 0,
+      "offset": 19,
+      "swappedWith": 21,
+      "picked": "kazanan_117"
+    },
+    {
+      "round": 3,
+      "remaining": 177,
+      "value": 240754203655713,
+      "attempt": 0,
+      "offset": 129,
+      "swappedWith": 132,
+      "picked": "kazanan_56"
+    },
+    {
+      "round": 4,
+      "remaining": 176,
+      "value": 86375971658221,
+      "attempt": 0,
+      "offset": 157,
+      "swappedWith": 161,
+      "picked": "kazanan_82"
+    }
+  ]
+}

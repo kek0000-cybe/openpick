@@ -1,0 +1,11 @@
+# Satır sonlarını her platformda LF'te sabitler.
+#
+# Bu satır kritik: katilimcilar.txt'nin SHA-256 özeti taahhüdün ta kendisi.
+# Windows'ta git satır sonlarını CRLF'e çevirseydi dosyanın özeti değişir,
+# dürüst bir üçüncü kişi doğrulama yaptığında sonuç tutmaz ve bizim hile
+# yaptığımız sonucuna varırdı. Bu dosyayı silme.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary

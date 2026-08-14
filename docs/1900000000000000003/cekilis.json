@@ -1,0 +1,30 @@
+{
+  "tweetId": "1900000000000000003",
+  "tweetUrl": "https://x.com/ornek/status/1900000000000000003",
+  "title": "DEMO — blok bekleme ornegi",
+  "prize": "Gercek bir odul degil, canli acilisi gostermek icin uretilmis ornek",
+  "committedAt": "2026-08-14T07:23:37.470Z",
+  "drawAt": "2026-08-14T09:22:37.470Z",
+  "drawnAt": null,
+  "publishedAt": "2026-08-14T09:23:37.536Z",
+  "participantCount": 95,
+  "rejectedCount": 2,
+  "filters": {
+    "mustHaveAvatar": true,
+    "minTweets": 100,
+    "minAccountAgeDays": 30
+  },
+  "commit": "5441694f29e220a3169d01ed1ed1b52806b62c93a6fcdeb7519ff2b8a9117052",
+  "commitTweetUrl": null,
+  "winnerCount": 1,
+  "backupCount": 0,
+  "bitcoin": {
+    "tipAtCommit": 962403,
+    "targetHeight": 962405,
+    "blockHash": null
+  },
+  "seed": null,
+  "winners": null,
+  "backups": null,
+  "steps": null
+}

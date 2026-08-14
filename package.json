@@ -1,0 +1,22 @@
+{
+  "name": "openpick",
+  "version": "0.2.0",
+  "description": "Kanitlanabilir adil (provably fair) X cekilis araci ve yayin sitesi",
+  "type": "module",
+  "scripts": {
+    "login": "node src/login.js",
+    "collect": "node src/collect.js",
+    "commit": "node src/commit.js",
+    "draw": "node src/draw.js",
+    "verify": "node src/verify.js",
+    "publish": "node src/publish.js",
+    "site": "node src/site.js",
+    "fixtures": "node test/fixtures.js",
+    "test": "node --test test/fairness.test.js test/parity.test.js",
+    "crosscheck": "node test/crosscheck.js",
+    "check": "npm test && npm run crosscheck"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0"
+  }
+}

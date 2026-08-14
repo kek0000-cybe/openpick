@@ -1,0 +1,10 @@
+# X oturum cerezleri - ASLA yayinlanmamali.
+# Bu klasor hesabina tam erisim saglayan token'lari icerir.
+.session/
+
+node_modules/
+
+# Ham calisma klasoru TAMAMEN disarida.
+# Yayinlanacak dosyalar buradan degil, publish.js araciligiyla docs/ altina
+# secilerek kopyalanir. Tek gecis noktasi olmasi sizinti riskini kaldirir.
+/data/

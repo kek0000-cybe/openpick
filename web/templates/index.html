@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{SITE_NAME}} — kanıtlanabilir adil çekilişler</title>
+<meta name="description" content="Kazananın matematiksel olarak seçildiği, herkesin kendi tarayıcısında doğrulayabildiği X çekilişleri.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:title" content="{{SITE_NAME}} — kanıtlanabilir adil çekilişler">
+<meta property="og:description" content="Kazananın matematiksel olarak seçildiği, herkesin kendi tarayıcısında doğrulayabildiği X çekilişleri.">
+<meta property="og:url" content="{{SITE_URL}}">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="varlik/site.css">
+</head>
+<body>
+<main>
+  <header class="site-head">
+    <span class="brand" lang="en">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>
+      {{SITE_NAME}}
+    </span>
+    <nav class="nav">
+      <a href="dogrula/">Doğrula</a>
+      <a href="{{REPO_URL}}" rel="noopener">Kaynak kodu</a>
+    </nav>
+  </header>
+
+  <h1>Kazananı kimse seçemez</h1>
+  <p class="lead">
+    Çoğu çekiliş aracı "adil" olduğunu söyler ve kanıt sunmaz — sonucun nereden geldiğini
+    göremezsin. Burada her çekilişin matematiği açık: listeyi kilitliyoruz, tohumu Bitcoin
+    ağından alıyoruz ve kazananı sen kendi tarayıcında yeniden hesaplayabiliyorsun.
+  </p>
+
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-title">Nasıl kanıtlanıyor</span>
+      <span class="badge">İki kilit</span>
+    </div>
+    <div class="panel-body">
+      <h3>1. Liste sonradan değiştirilemez</h3>
+      <p class="muted">Katılım kapandığında listenin SHA-256 özetini yayınlıyoruz. Tek bir
+        kişi eklense veya çıkarılsa özet tamamen değişir — herkes fark eder.</p>
+      <h3>2. Sonucu kimse önceden bilemez — biz dahil</h3>
+      <p class="muted">Tohum, henüz kazılmamış bir Bitcoin bloğunun hash'i. O blok
+        gelecekte olduğu için hash'ini kimse bilemez, kimse etkileyemez.</p>
+      <p class="dim">İkisi birleşince: liste kilitlendiğinde sonuç henüz belli değildir,
+        sonuç belli olduğunda liste artık değiştirilemez. Aradaki boşluk kapalıdır.</p>
+    </div>
+  </div>
+
+  <h2>Çekilişler</h2>
+  {{CARDS}}
+
+  <footer class="foot">
+    <p>Çekilişi herkes hesaplar, sonucu kimse seçemez.</p>
+    <p><a href="{{REPO_URL}}" rel="noopener">Kaynak kodu açık</a> · {{CONTACT}}</p>
+  </footer>
+</main>
+</body>
+</html>
