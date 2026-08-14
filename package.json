@@ -8,6 +8,7 @@
     "collect": "node src/collect.js",
     "commit": "node src/commit.js",
     "draw": "node src/draw.js",
+    "watch": "node src/watch.js",
     "verify": "node src/verify.js",
     "publish": "node src/publish.js",
     "site": "node src/site.js",

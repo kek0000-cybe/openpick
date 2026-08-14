@@ -72,7 +72,8 @@ for (const [idx, c] of CASES.entries()) {
 for (const entry of fs.readdirSync(DOCS, { withFileTypes: true })) {
   if (!entry.isDirectory() || !/^[0-9]{5,25}$/.test(entry.name)) continue;
   const meta = readJson(path.join(DOCS, entry.name, 'cekilis.json'));
-  if (!meta?.bitcoin?.blockHash) continue;
+  const deger = meta?.randomness?.value ?? meta?.bitcoin?.blockHash;
+  if (!deger) continue;
 
   await page.goto(pathToFileURL(path.join(DOCS, entry.name, 'index.html')).href);
   await page.waitForFunction(
@@ -89,7 +90,7 @@ for (const entry of fs.readdirSync(DOCS, { withFileTypes: true })) {
   const listFile = path.join(DOCS, entry.name, 'katilimcilar.txt');
   const handles = fs.readFileSync(listFile, 'utf8').split('\n').filter(Boolean);
   const node = runDraw({
-    handles, blockHash: meta.bitcoin.blockHash,
+    handles, blockHash: deger,
     winnerCount: meta.winners.length, backupCount: meta.backups.length, commit: meta.commit,
   });
 

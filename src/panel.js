@@ -58,6 +58,14 @@ const KOMUTLAR = {
     const id = String(a.tweetId).replace(/[^0-9]/g, '');
     return { args: ['src/publish.js', '--tweet', id], tweetId: id };
   },
+  watch: (a) => {
+    const id = String(a.tweetId).replace(/[^0-9]/g, '');
+    const args = ['src/watch.js', '--tweet', id,
+      '--winners', String(Number(a.winners) || 1),
+      '--backups', String(Number(a.backups) || 0)];
+    if (a.push) args.push('--push');
+    return { args, tweetId: id };
+  },
   login: () => ({ args: ['src/login.js'] }),
 };
 

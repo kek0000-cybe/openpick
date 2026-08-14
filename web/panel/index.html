@@ -74,8 +74,19 @@
             <input id="prize" placeholder="Örn. 1 adet PlayStation 5"></div>
         </div>
         <div class="ikili">
-          <div class="alan"><label for="drawAt">Çekiliş zamanı <span class="ipucu">(geri sayım buna işler)</span></label>
-            <input id="drawAt" type="datetime-local"></div>
+          <div class="alan"><label for="ne-zaman">Çekiliş ne zaman?</label>
+            <select id="ne-zaman">
+              <option value="30">30 saniye sonra</option>
+              <option value="120" selected>2 dakika sonra</option>
+              <option value="300">5 dakika sonra</option>
+              <option value="900">15 dakika sonra</option>
+              <option value="3600">1 saat sonra</option>
+              <option value="saat">Belirli bir saatte…</option>
+            </select>
+            <input id="drawAt" type="datetime-local" class="gizli" style="margin-top: var(--sp-4)">
+            <div class="ipucu" style="margin-top: var(--sp-4)">Taahhüt tweetini atacaksan
+              en az 2 dakika bırak — tweetin, rastgelelik üretilmeden önce yayınlanmış olmalı.</div>
+          </div>
           <div class="alan"><label for="winners">Kazanan / yedek sayısı</label>
             <div class="satir" style="margin:0">
               <div><input id="winners" type="number" min="1" value="1"></div>
@@ -162,12 +173,27 @@
     </div>
 
     <div class="duzlem">
-      <div class="duzlem-bas"><span class="duzlem-baslik">Sırayla</span></div>
+      <div class="duzlem-bas">
+        <span class="duzlem-baslik">Otomatik</span>
+        <span class="rozet iyi"><span class="rozet-nokta"></span>tek düğme</span>
+      </div>
       <div class="duzlem-govde">
-        <p class="ucuncul">Taahhüt, katılımı kapatır ve listeyi kilitler. Ürettiği tweet
-          metnini yayınla — kanıtın belkemiği o. Sonra blok kazılınca çekilişi yap.</p>
+        <p class="ucuncul">Taahhüt verilir, rastgelelik gelene kadar beklenir, çekiliş
+          yapılır ve sonuç siteye gönderilir. Sen hiçbir şeye dokunmazsın.</p>
+        <label class="onay"><input type="checkbox" id="otoPush" checked>
+          Bitince herkese açık siteye de gönder</label>
         <div class="dugmeler">
-          <button class="dugme ana" id="taahhut" type="button">1 · Taahhüt et</button>
+          <button class="dugme ana" id="otomatik" type="button">Çekilişi otomatik tamamla</button>
+        </div>
+        <div class="kayit gizli" id="logOto"></div>
+      </div>
+    </div>
+
+    <div class="duzlem">
+      <div class="duzlem-bas"><span class="duzlem-baslik">Ya da tek tek</span></div>
+      <div class="duzlem-govde">
+        <div class="dugmeler">
+          <button class="dugme" id="taahhut" type="button">1 · Taahhüt et</button>
           <button class="dugme" id="cek" type="button">2 · Çekilişi yap</button>
           <button class="dugme" id="yayinla" type="button">3 · Siteye yayınla</button>
         </div>
@@ -259,12 +285,18 @@ $('topla').addEventListener('click', () => {
 $('ileri2').addEventListener('click', () => goster(3));
 
 /* adim 3 */
+$('ne-zaman').addEventListener('change', (e) =>
+  $('drawAt').classList.toggle('gizli', e.target.value !== 'saat'));
+
 function filtreler() {
+  const neZaman = $('ne-zaman').value;
   return {
     tweetId: durum.tweetId,
     title: $('title').value.trim() || undefined,
     prize: $('prize').value.trim() || undefined,
-    drawAt: $('drawAt').value ? new Date($('drawAt').value).toISOString() : undefined,
+    inSeconds: neZaman === 'saat' ? undefined : +neZaman,
+    drawAt: neZaman === 'saat' && $('drawAt').value
+      ? new Date($('drawAt').value).toISOString() : undefined,
     commitTweetUrl: $('commitTweet').value.trim() || undefined,
     minTweets: +$('minTweets').value || undefined,
     minAgeDays: +$('minAge').value || undefined,
@@ -273,6 +305,28 @@ function filtreler() {
     exclude: $('exclude').value.trim() || undefined,
   };
 }
+/* tek dugmeyle bastan sona */
+$('otomatik').addEventListener('click', async () => {
+  const dugme = $('otomatik');
+  dugme.disabled = true;
+  dugme.textContent = 'Taahhüt veriliyor…';
+  const t = await calistir('commit', filtreler(), 'logOto');
+  if (!t || t.kod !== 0) {
+    dugme.disabled = false;
+    dugme.textContent = 'Çekilişi otomatik tamamla';
+    return;
+  }
+  dugme.textContent = 'Rastgelelik bekleniyor…';
+  await calistir('watch', {
+    tweetId: durum.tweetId,
+    winners: +$('winners').value || 1,
+    backups: +$('backups').value || 0,
+    push: $('otoPush').checked,
+  }, 'logOto');
+  dugme.disabled = false;
+  dugme.textContent = 'Çekilişi otomatik tamamla';
+});
+
 $('taahhut').addEventListener('click', () => calistir('commit', filtreler(), 'log3'));
 $('cek').addEventListener('click', () => calistir('draw', {
   tweetId: durum.tweetId, winners: +$('winners').value || 1, backups: +$('backups').value || 0,

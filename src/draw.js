@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { drawDir, readJson, writeJson } from './paths.js';
 import { runDraw } from './fairness.js';
-import { hashAtHeightConfirmed, currentHeight } from './bitcoin.js';
+import { rastgeleligiAl, kaynakBilgisi } from './randomness.js';
 
 function parseArgs(argv) {
   const args = { winners: 1, backups: 0 };
@@ -27,26 +27,20 @@ if (!commitment) {
   process.exit(1);
 }
 
-const target = commitment.bitcoin.targetHeight;
-const { hash: blockHash, confirmedBy } = await hashAtHeightConfirmed(target);
-if (!blockHash) {
-  const tip = await currentHeight();
-  console.error(`
-  ${target} numarali blok henuz kazilmadi (su anki yukseklik: ${tip}).
-  Yaklasik ${Math.max(0, (target - tip) * 10)} dakika sonra tekrar dene.
-`);
+const kaynak = await rastgeleligiAl(commitment);
+if (!kaynak.hazir) {
+  console.error(`\n  ${kaynak.mesaj}\n  Otomatik beklemek icin: npm run watch -- --tweet ${args.tweetId}\n`);
   process.exit(1);
 }
-if (confirmedBy < 2) {
-  console.log('  ! Blok hash yalnizca tek saglayicidan dogrulanabildi.');
+if (kaynak.confirmedBy < 2) {
+  console.log('  ! Deger yalnizca tek kaynaktan dogrulanabildi.');
 }
 
-const listFile = path.join(dir, 'katilimcilar.txt');
-const handles = fs.readFileSync(listFile, 'utf8').split('\n').filter(Boolean);
+const handles = fs.readFileSync(path.join(dir, 'katilimcilar.txt'), 'utf8').split('\n').filter(Boolean);
 
 const result = runDraw({
   handles,
-  blockHash,
+  blockHash: kaynak.deger,
   winnerCount: args.winners,
   backupCount: args.backups,
   commit: commitment.commit,
@@ -55,21 +49,23 @@ const result = runDraw({
 const record = {
   ...commitment,
   drawnAt: new Date().toISOString(),
-  bitcoin: { ...commitment.bitcoin, blockHash, confirmedBy },
+  randomness: { ...kaynakBilgisi(commitment), value: kaynak.deger, confirmedBy: kaynak.confirmedBy },
   seed: result.seed,
   winners: result.winners,
   backups: result.backups,
   steps: result.steps,
 };
+delete record.bitcoin;
 writeJson(path.join(dir, 'result.json'), record);
 
 console.log(`
   CEKILIS SONUCU
   ==============
-  Katilimci sayisi : ${result.participantCount}
-  Liste ozeti      : ${result.commit}
-  Blok ${String(target).padEnd(11)}: ${blockHash}
-  Tohum            : ${result.seed}
+  Katilimci  : ${result.participantCount}
+  Liste ozeti: ${result.commit}
+  Kaynak     : ${kaynak.etiket}
+  Deger      : ${kaynak.deger}
+  Tohum      : ${result.seed}
 
   Kazananlar:`);
 result.winners.forEach((h, i) => console.log(`    ${i + 1}. @${h}`));
@@ -79,6 +75,5 @@ if (result.backups.length) {
 }
 console.log(`
   Kaydedildi: ${path.join(dir, 'result.json')}
-  Bagimsiz dogrulama: npm run verify -- --tweet ${args.tweetId}
-  Siteye yayinla    : npm run publish -- --tweet ${args.tweetId}
+  Siteye    : npm run publish -- --tweet ${args.tweetId}
 `);

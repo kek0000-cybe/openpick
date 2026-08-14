@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{TITLE}} — {{SITE_NAME}}</title>
 <meta name="description" content="{{DESC}}">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://blockstream.info https://mempool.emzy.de https://mempool.space">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.drand.sh https://api2.drand.sh https://api3.drand.sh https://blockstream.info https://mempool.emzy.de https://mempool.space">
 <meta property="og:type" content="article">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:site_name" content="{{SITE_NAME}}">
@@ -69,9 +69,9 @@
       <div data-phase="blok-bekleniyor">
         <div class="sayac-etiket">
           <svg class="hrk-donuyor" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
-          Blok bekleniyor
+          Sonuç hesaplanıyor
         </div>
-        <p class="orta ikincil" id="watch-status">Hedef blok sorgulanıyor…</p>
+        <p class="orta ikincil" id="watch-status">Rastgelelik sorgulanıyor…</p>
         <div class="orta"><button id="watch-retry" class="dugme gizli" type="button">Tekrar dene</button></div>
       </div>
 
@@ -107,9 +107,9 @@
           <div class="bilgi-deger duz">{{COUNT}} kişi · {{REJECTED}} eleme</div></div>
         <div class="bilgi"><div class="bilgi-ad">Liste özeti</div>
           <div class="bilgi-deger">{{COMMIT}}</div></div>
-        <div class="bilgi"><div class="bilgi-ad">Bitcoin bloğu</div>
-          <div class="bilgi-deger duz"><a href="https://blockstream.info/block-height/{{TARGET_HEIGHT}}" rel="noopener">{{TARGET_HEIGHT}}</a></div></div>
-        <div class="bilgi"><div class="bilgi-ad">Blok hash</div>
+        <div class="bilgi"><div class="bilgi-ad">Rastgelelik kaynağı</div>
+          <div class="bilgi-deger duz"><a href="{{SOURCE_LINK}}" rel="noopener">{{SOURCE_LABEL}}</a></div></div>
+        <div class="bilgi"><div class="bilgi-ad">Gelen değer</div>
           <div class="bilgi-deger" id="f-blockhash">—</div></div>
         <div class="bilgi"><div class="bilgi-ad">Tohum</div>
           <div class="bilgi-deger" id="f-seed">—</div></div>
@@ -139,6 +139,7 @@
 <script>
 {{ENGINE}}
 {{CHAIN}}
+{{BEACON}}
 {{PAGE}}
 </script>
 </body>

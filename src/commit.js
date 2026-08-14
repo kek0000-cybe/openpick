@@ -4,14 +4,17 @@ import { drawDir, readJson, writeJson } from './paths.js';
 import { applyFilters } from './filters.js';
 import { commitHash, canonicalize } from './fairness.js';
 import { currentHeight } from './bitcoin.js';
+import { roundAt, roundTime, DRAND } from './beacon.js';
 
-const BLOCK_SECONDS = 600; // Bitcoin'de ortalama blok araligi
+const BLOCK_SECONDS = 600;
 
 function parseArgs(argv) {
-  const args = { blocksAhead: 6, filters: {} };
+  const args = { source: 'drand', inSeconds: 120, blocksAhead: 6, filters: {} };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--tweet') args.tweetId = argv[++i];
+    else if (a === '--source') args.source = argv[++i];
+    else if (a === '--in') args.inSeconds = Number(argv[++i]);
     else if (a === '--draw-at') args.drawAt = argv[++i];
     else if (a === '--blocks-ahead') args.blocksAhead = Number(argv[++i]);
     else if (a === '--commit-tweet') args.commitTweetUrl = argv[++i];
@@ -29,15 +32,21 @@ function parseArgs(argv) {
     console.error(`
 Kullanim: npm run commit -- --tweet <tweetId> [secenekler]
 
-  --draw-at <ISO>       Cekilis saati, orn. 2026-08-20T21:00:00+03:00
-  --blocks-ahead <n>    --draw-at verilmezse kac blok sonra (varsayilan 6)
-  --title "..."         Sitede gorunecek baslik
-  --prize "..."         Odul aciklamasi
-  --commit-tweet <url>  Taahhut tweetinin linki (sonradan da eklenebilir)
+  --source drand    (varsayilan) 3 saniyelik turlar — sonuc neredeyse aninda
+  --source bitcoin  ~10 dakikalik bloklar — daha yavas
+  --in <saniye>     Cekilise kalan sure (drand, varsayilan 120)
+  --draw-at <ISO>   Kesin cekilis saati, orn. 2026-08-20T21:00:00+03:00
+  --title "..."     Sitede gorunecek baslik
+  --prize "..."     Odul aciklamasi
+  --commit-tweet <url>
 
 Filtreler: --min-tweets --min-age-days --require-banner --require-bio
            --require-location --allow-default-avatar --exclude @a,@b
 `);
+    process.exit(1);
+  }
+  if (!['drand', 'bitcoin'].includes(args.source)) {
+    console.error(`\n  --source yalnizca "drand" ya da "bitcoin" olabilir.\n`);
     process.exit(1);
   }
   return args;
@@ -56,19 +65,17 @@ let drawAt;
 if (args.drawAt) {
   drawAt = new Date(args.drawAt);
   if (Number.isNaN(drawAt.getTime())) {
-    console.error(`\n  --draw-at anlasilamadi: ${args.drawAt}\n  Ornek: 2026-08-20T21:00:00+03:00\n`);
+    console.error(`\n  --draw-at anlasilamadi: ${args.drawAt}\n`);
     process.exit(1);
   }
-  if (drawAt <= now) {
-    console.error('\n  --draw-at gelecekte olmali.\n');
-    process.exit(1);
-  }
+} else if (args.source === 'drand') {
+  drawAt = new Date(now.getTime() + Math.max(15, args.inSeconds) * 1000);
 } else {
-  if (!Number.isInteger(args.blocksAhead) || args.blocksAhead < 1) {
-    console.error('\n  --blocks-ahead en az 1 olmali: tohum gelecekteki bir bloktan gelmeli.\n');
-    process.exit(1);
-  }
-  drawAt = new Date(now.getTime() + args.blocksAhead * BLOCK_SECONDS * 1000);
+  drawAt = new Date(now.getTime() + Math.max(1, args.blocksAhead) * BLOCK_SECONDS * 1000);
+}
+if (drawAt <= now) {
+  console.error('\n  Cekilis ani gelecekte olmali.\n');
+  process.exit(1);
 }
 
 const { passed, rejected, filters } = applyFilters(data.users, args.filters);
@@ -79,18 +86,32 @@ if (passed.length === 0) {
 
 const handles = passed.map((u) => u.handle);
 const commit = commitHash(handles);
-const tip = await currentHeight();
 
 /*
- * Taahhut BLOK YUKSEKLIGI olarak sabitlenir, saat olarak degil.
- * Blok zaman damgalari monotonik degildir ve kismen madenci kontrolundedir;
- * "su saatten sonraki ilk blok" tanimi hem oynatilabilir hem de dogrulayaniN
- * bir API'ye sormasini gerektirirdi. Yukseklik ise kesin, oynatilamaz ve
- * herhangi bir blok gezgininden cevrimdisi teyit edilebilir.
- * drawAt yalnizca geri sayim icindir; sonuca hicbir etkisi yoktur.
+ * Rastgelelik kaynagi GELECEKTE bir noktaya sabitlenir.
+ * O an gelmeden deger uretilmedigi icin ne biz ne baskasi sonucu bilebilir;
+ * bilinebilseydi liste ya da filtreler istenen kazanan cikana kadar denenirdi.
  */
-const blocksAway = Math.max(1, Math.ceil((drawAt - now) / (BLOCK_SECONDS * 1000)));
-const targetHeight = tip + blocksAway;
+let randomness;
+if (args.source === 'drand') {
+  const hedefTur = roundAt(Math.floor(drawAt.getTime() / 1000));
+  const suan = roundAt(Math.floor(now.getTime() / 1000));
+  if (hedefTur <= suan) {
+    console.error('\n  Hedef tur gecmiste kaliyor. --in degerini buyut.\n');
+    process.exit(1);
+  }
+  randomness = {
+    source: 'drand',
+    chain: DRAND.chain,
+    round: hedefTur,
+    roundAt: new Date(roundTime(hedefTur) * 1000).toISOString(),
+  };
+  drawAt = new Date(roundTime(hedefTur) * 1000);
+} else {
+  const tip = await currentHeight();
+  const blocksAway = Math.max(1, Math.ceil((drawAt - now) / (BLOCK_SECONDS * 1000)));
+  randomness = { source: 'bitcoin', tipAtCommit: tip, targetHeight: tip + blocksAway };
+}
 
 const canonicalList = canonicalize(handles);
 fs.writeFileSync(path.join(dir, 'katilimcilar.txt'), canonicalList, 'utf8');
@@ -107,36 +128,37 @@ const commitment = {
   filters,
   commit,
   commitTweetUrl: args.commitTweetUrl ?? null,
-  bitcoin: { tipAtCommit: tip, targetHeight },
+  randomness,
 };
 writeJson(path.join(dir, 'commitment.json'), commitment);
 writeJson(path.join(dir, 'rejected.json'), rejected);
 
-const localTime = drawAt.toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' });
+const yerel = drawAt.toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' });
+const kaynakMetin = randomness.source === 'drand'
+  ? `drand turu ${randomness.round}`
+  : `${randomness.targetHeight} numarali Bitcoin blogu`;
+const kalanSn = Math.round((drawAt - now) / 1000);
 
 console.log(`
   Taahhut olusturuldu
   -------------------
-  Katilimci sayisi : ${passed.length}   (elenen: ${rejected.length})
-  Liste ozeti      : ${commit}
-  Cekilis saati    : ${localTime}
-  Bitcoin blogu    : ${targetHeight}   (su an ${tip})
+  Katilimci  : ${passed.length}   (elenen: ${rejected.length})
+  Liste ozeti: ${commit}
+  Kaynak     : ${kaynakMetin}
+  Cekilis    : ${yerel}   (${kalanSn} saniye sonra)
 
-  Simdi asagidaki metni tweetle. Bu tweet kanitin belkemigi: taahhudun blok
-  kazilmadan ONCE yayinlandigini gosteren tek delil o.
+  Asagidaki metni tweetle. Bu tweet kanitin belkemigi: taahhudun rastgelelik
+  uretilmeden ONCE yayinlandigini gosteren tek delil o.
 
   ----------------------------------------------------------------
   Cekilis katilimi kapandi.
   Katilimci: ${passed.length}
   Liste ozeti (SHA-256): ${commit}
-  Tohum: ${targetHeight} numarali Bitcoin blogunun hash'i
-  Cekilis: ${localTime}
+  Tohum: ${kaynakMetin}
+  Cekilis: ${yerel}
   Kazananlari herkes kendi tarayicisinda dogrulayabilecek.
   ----------------------------------------------------------------
 
-  Tweeti attiktan sonra linkini kaydet:
-    npm run commit -- --tweet ${args.tweetId} --commit-tweet <tweet-linki>   (ayni ayarlarla)
-
-  Blok kazilinca:
-    npm run draw -- --tweet ${args.tweetId} --winners 3
+  Cekilis:  npm run draw -- --tweet ${args.tweetId} --winners 1
+  Otomatik: npm run watch -- --tweet ${args.tweetId} --winners 1
 `);

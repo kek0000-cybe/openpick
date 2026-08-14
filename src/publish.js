@@ -123,10 +123,11 @@ async function publishDraw(tweetId) {
   fs.copyFileSync(listSrc, path.join(dstDir, 'katilimcilar.txt'));
 
   /* 2) Cekilis yapildiysa sonucu bagimsiz olarak yeniden dogrula. */
-  if (record.bitcoin?.blockHash) {
+  const kaynak = record.randomness ?? { source: 'bitcoin', ...record.bitcoin, value: record.bitcoin?.blockHash };
+  if (kaynak.value) {
     const check = runDraw({
       handles: lines,
-      blockHash: record.bitcoin.blockHash,
+      blockHash: kaynak.value,
       winnerCount: record.winners.length,
       backupCount: record.backups.length,
       commit: record.commit,
@@ -158,10 +159,15 @@ async function publishDraw(tweetId) {
     commitTweetUrl: record.commitTweetUrl ?? null,
     winnerCount,
     backupCount,
-    bitcoin: {
-      tipAtCommit: record.bitcoin.tipAtCommit,
-      targetHeight: record.bitcoin.targetHeight,
-      blockHash: record.bitcoin.blockHash ?? null,
+    randomness: {
+      source: kaynak.source,
+      round: kaynak.round ?? null,
+      chain: kaynak.chain ?? null,
+      roundAt: kaynak.roundAt ?? null,
+      tipAtCommit: kaynak.tipAtCommit ?? null,
+      targetHeight: kaynak.targetHeight ?? null,
+      value: kaynak.value ?? null,
+      confirmedBy: kaynak.confirmedBy ?? null,
     },
     seed: record.seed ?? null,
     winners: record.winners ?? null,
@@ -206,7 +212,12 @@ async function publishDraw(tweetId) {
     COMMIT: esc(pub.commit),
     COUNT: String(pub.participantCount),
     REJECTED: String(pub.rejectedCount ?? 0),
-    TARGET_HEIGHT: String(pub.bitcoin.targetHeight),
+    SOURCE_LABEL: esc(pub.randomness.source === 'drand'
+      ? `drand turu ${pub.randomness.round}`
+      : `Bitcoin bloğu ${pub.randomness.targetHeight}`),
+    SOURCE_LINK: esc(pub.randomness.source === 'drand'
+      ? `https://api.drand.sh/${pub.randomness.chain}/public/${pub.randomness.round}`
+      : `https://blockstream.info/block-height/${pub.randomness.targetHeight}`),
     COMMIT_TWEET_ROW: commitRow,
     TILES: tiles.join(''),
     AS_OF: pub.drawnAt ? '' : ` · son güncelleme ${esc(trDate(pub.publishedAt))}`,
@@ -215,6 +226,7 @@ async function publishDraw(tweetId) {
     DRAW_JSON: jsonLiteral(pub),
     ENGINE: inlineModule('lib/engine.js'),
     CHAIN: inlineModule('lib/chain.js'),
+    BEACON: inlineModule('lib/beacon.js'),
     PAGE: inlineModule('lib/page.js'),
   });
   fs.writeFileSync(path.join(dstDir, 'index.html'), html, 'utf8');
@@ -240,7 +252,7 @@ function publishShared(entries) {
   const cards = entries.length === 0
     ? '<p class="ikincil">Henüz yayınlanmış çekiliş yok.</p>'
     : entries.map((e, i) => {
-        const done = Boolean(e.bitcoin.blockHash);
+        const done = Boolean(e.randomness?.value);
         const rozet = done
           ? '<span class="rozet iyi"><span class="rozet-nokta"></span>sonuçlandı</span>'
           : '<span class="rozet"><span class="rozet-nokta"></span>yaklaşan</span>';
@@ -265,7 +277,7 @@ function publishShared(entries) {
 
   writeJson(path.join(outRoot, 'draws.json'), entries.map((e) => ({
     tweetId: e.tweetId, title: e.title, drawAt: e.drawAt,
-    participantCount: e.participantCount, done: Boolean(e.bitcoin.blockHash),
+    participantCount: e.participantCount, done: Boolean(e.randomness?.value),
   })));
 }
 

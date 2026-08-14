@@ -1,0 +1,72 @@
+{
+  "tweetId": "2087997939209658687",
+  "tweetUrl": "https://x.com/lordsinov/status/2087997939209658687",
+  "title": "Test cekilisi",
+  "prize": "openpick ilk gercek cekilis",
+  "committedAt": "2026-08-14T10:11:01.664Z",
+  "drawAt": "2026-08-14T10:11:30.000Z",
+  "drawnAt": "2026-08-14T10:11:32.597Z",
+  "publishedAt": "2026-08-14T10:11:32.662Z",
+  "participantCount": 14,
+  "rejectedCount": 0,
+  "filters": {
+    "mustHaveAvatar": true,
+    "mustHaveBanner": false,
+    "mustHaveDescription": false,
+    "mustHaveLocation": false,
+    "minTweets": 0,
+    "minAccountAgeDays": 0,
+    "excludeHandles": []
+  },
+  "commit": "180108d413d1805155c4a89966b6bcae63f58eef0a62a2e5c48b4878c39d0af1",
+  "commitTweetUrl": null,
+  "winnerCount": 1,
+  "backupCount": 2,
+  "randomness": {
+    "source": "drand",
+    "round": 31299642,
+    "chain": "52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971",
+    "roundAt": "2026-08-14T10:11:30.000Z",
+    "tipAtCommit": null,
+    "targetHeight": null,
+    "value": "2f81c8eed824725a4b89dae8032dfe292dea1b4afaed9ecf66224b754a5c4dcd",
+    "confirmedBy": 2
+  },
+  "seed": "84bb25a53ffd0bc166eff4dbd14799d37d13fb8c1f4170ae12386243f5f5196a",
+  "winners": [
+    "aslanmurat63"
+  ],
+  "backups": [
+    "danby_moonlight",
+    "attila_mutun"
+  ],
+  "steps": [
+    {
+      "round": 0,
+      "remaining": 14,
+      "value": 239786800435940,
+      "attempt": 0,
+      "offset": 2,
+      "swappedWith": 2,
+      "picked": "aslanmurat63"
+    },
+    {
+      "round": 1,
+      "remaining": 13,
+      "value": 185145256327217,
+      "attempt": 0,
+      "offset": 4,
+      "swappedWith": 5,
+      "picked": "danby_moonlight"
+    },
+    {
+      "round": 2,
+      "remaining": 12,
+      "value": 167154119511193,
+      "attempt": 0,
+      "offset": 1,
+      "swappedWith": 3,
+      "picked": "attila_mutun"
+    }
+  ]
+}

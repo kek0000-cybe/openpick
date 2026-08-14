@@ -21,7 +21,7 @@ const EVRE_ADI = {
 
 function pPhase(now = Date.now()) {
   if (!pDraw.commit) return 'acik';
-  if (pDraw.bitcoin?.blockHash || pRevealed.blockHash) return 'sonuclandi';
+  if (pDraw.randomness?.value || pRevealed.blockHash) return 'sonuclandi';
   if (now < new Date(pDraw.drawAt).getTime()) return 'kilitli';
   return 'blok-bekleniyor';
 }
@@ -87,31 +87,50 @@ function pIzlemeBaslat() {
 }
 
 async function pIzlemeDongusu() {
-  const height = pDraw.bitcoin.targetHeight;
+  const kaynak = pDraw.randomness;
+  const drand = kaynak.source === 'drand';
   const durum = pEl('watch-status');
+  // drand 3 saniyede bir üretiyor, Bitcoin ~10 dakikada. Boşuna sorgu atmayalım.
+  const bekle = () => (drand ? 2000 : 20000 + Math.random() * 20000);
 
   while (Date.now() < pDurmaAni) {
-    if (document.visibilityState === 'hidden') { await pSleep(5000); continue; }
+    if (document.visibilityState === 'hidden') { await pSleep(3000); continue; }
     try {
-      const tip = await currentHeight();
-      if (durum) {
-        const uzak = Math.max(0, height - tip);
-        durum.textContent = uzak === 0
-          ? 'Blok kazıldı, sonuç hesaplanıyor…'
-          : `Hedef blok ${height} · şu anki yükseklik ${tip} · yaklaşık ${uzak * 10} dakika`;
-      }
-      const { hash, confirmedBy } = await hashAtHeightConfirmed(height);
-      if (hash) {
-        pRevealed.blockHash = hash;
-        pRevealed.confirmedBy = confirmedBy;
-        await pCanliHesapla(hash);
-        return;
+      if (drand) {
+        const suan = currentRound();
+        const kalan = Math.max(0, kaynak.round - suan);
+        if (durum) {
+          durum.textContent = kalan === 0
+            ? 'Değer geldi, sonuç hesaplanıyor…'
+            : `drand turu ${kaynak.round} · şu an ${suan} · yaklaşık ${kalan * 3} saniye`;
+        }
+        const { randomness, confirmedBy } = await randomnessConfirmed(kaynak.round);
+        if (randomness) {
+          pRevealed.blockHash = randomness;
+          pRevealed.confirmedBy = confirmedBy;
+          await pCanliHesapla(randomness);
+          return;
+        }
+      } else {
+        const tip = await currentHeight();
+        if (durum) {
+          const uzak = Math.max(0, kaynak.targetHeight - tip);
+          durum.textContent = uzak === 0
+            ? 'Blok kazıldı, sonuç hesaplanıyor…'
+            : `Hedef blok ${kaynak.targetHeight} · şu an ${tip} · yaklaşık ${uzak * 10} dakika`;
+        }
+        const { hash, confirmedBy } = await hashAtHeightConfirmed(kaynak.targetHeight);
+        if (hash) {
+          pRevealed.blockHash = hash;
+          pRevealed.confirmedBy = confirmedBy;
+          await pCanliHesapla(hash);
+          return;
+        }
       }
     } catch (err) {
-      if (durum) durum.textContent = `Blok sorgulanamadı: ${err.message} — tekrar denenecek.`;
+      if (durum) durum.textContent = `Sorgulanamadı: ${err.message} — tekrar denenecek.`;
     }
-    // Sıçramalı bekleme: yüzlerce ziyaretçi aynı anda ücretsiz API'yi dövmesin.
-    await pSleep(20000 + Math.random() * 20000);
+    await pSleep(bekle());
   }
   pEl('watch-retry')?.classList.remove('gizli');
   pIzliyor = false;
@@ -139,11 +158,11 @@ async function pSonucCiz() {
   pCizildi = true;
 
   const d = pRevealed.result
-    ? { ...pDraw, ...pRevealed.result, bitcoin: { ...pDraw.bitcoin, blockHash: pRevealed.blockHash } }
+    ? { ...pDraw, ...pRevealed.result, randomness: { ...pDraw.randomness, value: pRevealed.blockHash } }
     : pDraw;
 
   const bh = pEl('f-blockhash');
-  if (bh) bh.textContent = d.bitcoin?.blockHash || '—';
+  if (bh) bh.textContent = d.randomness?.value || '—';
   const sd = pEl('f-seed');
   if (sd) sd.textContent = d.seed || '—';
 

@@ -22,7 +22,18 @@ Geri sayım bitince ziyaretçinin tarayıcısı blok hash'ini doğrudan Bitcoin 
 kazananları kendisi hesaplar — biz hiçbir şey yayınlamadan önce. Herkes aynı anda,
 birbirinden bağımsız, aynı sonucu bulur.
 
-### Neden blok yüksekliği, saat değil?
+### Rastgelelik nereden geliyor?
+
+Varsayılan kaynak **drand** (League of Entropy): dağıtık bir eşik imza ağının her
+**3 saniyede** bir ürettiği, herkesin doğrulayabildiği rastgele değer. Tur numarası
+zamandan kesin hesaplanır, yani "şu saatte şu tur kullanılacak" önceden ilan edilebilir;
+ama o turun değeri zamanı gelmeden üretilmez. Sonuç neredeyse anında gelir ve garanti
+bozulmaz.
+
+Bitcoin bloğu da kullanılabilir (`--source bitcoin`) ama blok aralığı ~10 dakika
+olduğu için çekiliş çok daha uzun sürer.
+
+### Bitcoin kullanırken: neden blok yüksekliği, saat değil?
 
 Taahhüt "şu saatten sonraki ilk blok" değil, **belirli bir blok numarası** olarak verilir.
 Bitcoin blok zaman damgaları monotonik değildir ve kısmen madenci kontrolündedir; saat
@@ -37,14 +48,16 @@ npm install
 npx playwright install chromium
 ```
 
-## Yönetim paneli (en kolay yol)
+## En kolay yol: çift tıkla
 
-```bash
-npm run panel
-```
+Klasördeki **`Cekilis Paneli.bat`** dosyasına çift tıkla. Panel açılır, tarayıcı
+kendiliğinden gelir. Komut yazmana gerek yok.
 
-`http://localhost:8090` açılır: tweet linkini yapıştırırsın, filtreleri seçersin ve
-toplama → taahhüt → çekiliş → yayınlama adımlarını düğmelerle yürütürsün.
+Panelde: tweet linkini yapıştır → filtreleri seç → **Çekilişi otomatik tamamla**.
+Gerisi kendiliğinden olur — taahhüt verilir, rastgelelik beklenir, çekiliş yapılır
+ve sonuç siteye gönderilir.
+
+Terminalden açmak istersen: `npm run panel` (`http://localhost:8090`)
 
 Panel yalnızca `127.0.0.1` üzerinden erişilebilir, yani ağdaki başka bir cihaz açamaz.
 Çalıştırabildiği komutlar sabit bir listede ve argümanlar dizi olarak geçirilir (kabuk
@@ -86,7 +99,15 @@ Tweeti attıktan sonra linkini kaydet:
 npm run commit -- --tweet 123456 --commit-tweet https://x.com/sen/status/999 --draw-at ... (aynı ayarlarla)
 ```
 
-### 4. Blok kazılınca çekilişi yap
+### 4. Çekilişi yap
+
+Otomatik (rastgeleliği bekler, çeker, yayınlar, siteye gönderir):
+
+```bash
+npm run watch -- --tweet 123456 --winners 3 --backups 2 --push
+```
+
+Ya da elle:
 
 ```bash
 npm run draw -- --tweet 123456 --winners 3 --backups 2
