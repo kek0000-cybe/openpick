@@ -21,11 +21,12 @@
 
 <header class="serit">
   <a class="marka" lang="en" href="../">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 7v5l3 3"/><path d="M17 2.5 22 5l-2.5 5"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>
     {{SITE_NAME}}
   </a>
   <nav class="gezinme">
     <a href="../">Çekilişler</a>
+    <a href="{{TWEET_URL}}" rel="noopener nofollow">Tweet</a>
     <a href="../dogrula/?draw={{TWEET_ID}}">Doğrula</a>
     <button class="tema-dugme" id="tema" type="button" aria-label="Temayı değiştir">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
@@ -34,23 +35,27 @@
 </header>
 
 <main class="kap">
-  <h1>{{TITLE}}</h1>
-  <p class="giris">{{DESC}}</p>
 
-  <div class="duzlem">
-    <div class="duzlem-bas">
-      <span class="duzlem-baslik" id="evre-ad">Çekiliş</span>
-      <span class="rozet">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+  <div class="vitrin">
+    <div class="vitrin-bas">
+      <span class="vitrin-ad">
+        <span class="vitrin-ikon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>
+        </span>
+        <span id="evre-ad">Çekiliş</span>
+      </span>
+      <span class="rozet iyi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
         Kanıtlanabilir adil
       </span>
     </div>
-    <div class="duzlem-govde">
+
+    <div class="vitrin-govde">
 
       <div data-phase="acik kilitli">
         <div class="sayac-etiket">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-          Çekilişe kalan süre
+          Çekilişe kalan
         </div>
         <div class="saat" id="clock">
           <div class="saat-birim"><div class="saat-sayi">--</div><div class="saat-ad">saat</div></div>
@@ -59,18 +64,14 @@
           <div class="saat-ayrac">:</div>
           <div class="saat-birim"><div class="saat-sayi">--</div><div class="saat-ad">saniye</div></div>
         </div>
-        <div class="serit-avatar">{{TILES}}</div>
-        <div class="katilimci-sayi"><strong>{{COUNT}}</strong> katılımcı onaylandı{{AS_OF}}</div>
       </div>
 
       <div data-phase="blok-bekleniyor">
         <div class="sayac-etiket">
           <svg class="hrk-donuyor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
-          Bitcoin bloğu bekleniyor
+          Blok bekleniyor
         </div>
         <p class="orta ikincil" id="watch-status">Hedef blok sorgulanıyor…</p>
-        <p class="orta ucuncul">Tohum, {{TARGET_HEIGHT}} numaralı bloğun hash'inden türetilecek.
-          Bu blok henüz kazılmadı — sonucu şu an kimse bilemez.</p>
         <div class="orta"><button id="watch-retry" class="dugme gizli" type="button">Tekrar dene</button></div>
       </div>
 
@@ -78,27 +79,33 @@
         <div class="uyari iyi gizli" id="live-banner">
           Bu sonucu senin tarayıcın hesapladı — sunucudan hazır gelmedi.
         </div>
-        <h3 style="margin-bottom: var(--sp-5)">Kazananlar</h3>
         <div class="kazananlar" id="winners"></div>
         <div id="backups-section" class="gizli">
-          <h3 style="margin: var(--sp-7) 0 var(--sp-5)">Yedekler</h3>
+          <div class="ucuncul" style="margin: var(--sp-6) 0 var(--sp-4)">Yedekler</div>
           <div class="kazananlar" id="backups"></div>
         </div>
+      </div>
+
+      <div class="serit-avatar">{{TILES}}</div>
+      <div class="katilimci-sayi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/></svg>
+        <span><strong>{{COUNT}}</strong> katılımcı onaylandı</span>
       </div>
 
     </div>
   </div>
 
   <div class="duzlem">
-    <div class="duzlem-bas"><span class="duzlem-baslik">Kanıt zinciri</span></div>
+    <div class="duzlem-bas">
+      <span class="duzlem-baslik">Kanıt</span>
+      <a href="../dogrula/?draw={{TWEET_ID}}">Kendin doğrula →</a>
+    </div>
     <div class="duzlem-govde">
       <div class="bilgiler">
-        <div class="bilgi"><div class="bilgi-ad">Çekiliş tweeti</div>
-          <div class="bilgi-deger duz"><a href="{{TWEET_URL}}" rel="noopener nofollow">X'te aç</a></div></div>
         {{COMMIT_TWEET_ROW}}
         <div class="bilgi"><div class="bilgi-ad">Katılımcı</div>
           <div class="bilgi-deger duz">{{COUNT}} kişi · {{REJECTED}} eleme</div></div>
-        <div class="bilgi"><div class="bilgi-ad">Liste özeti (SHA-256)</div>
+        <div class="bilgi"><div class="bilgi-ad">Liste özeti</div>
           <div class="bilgi-deger">{{COMMIT}}</div></div>
         <div class="bilgi"><div class="bilgi-ad">Bitcoin bloğu</div>
           <div class="bilgi-deger duz"><a href="https://blockstream.info/block-height/{{TARGET_HEIGHT}}" rel="noopener">{{TARGET_HEIGHT}}</a></div></div>
@@ -108,10 +115,9 @@
           <div class="bilgi-deger" id="f-seed">—</div></div>
       </div>
       <div class="dugmeler">
-        <a class="dugme ana" href="../dogrula/?draw={{TWEET_ID}}">Bağımsız doğrula</a>
         <a class="dugme" href="katilimcilar.txt">Katılımcı listesi</a>
-        <a class="dugme" href="cekilis.json">Ham veri</a>
         <a class="dugme" href="elenenler.json">Elenenler</a>
+        <a class="dugme" href="cekilis.json">Ham veri</a>
       </div>
     </div>
   </div>
@@ -119,19 +125,14 @@
   <div class="duzlem" data-phase="sonuclandi">
     <div class="duzlem-bas"><span class="duzlem-baslik">Seçim matematiği</span></div>
     <div class="duzlem-govde">
-      <p class="ucuncul" style="margin-bottom: var(--sp-6)">Her tur aşağıda yeniden
-        hesaplanıyor. Sayfa kayıtlı değeri göstermekle kalmıyor; tohumdan yola çıkıp aynı
-        sonucu kendi üretip karşılaştırıyor.</p>
       <div class="adimlar" id="steps"></div>
     </div>
   </div>
 </main>
 
 <footer class="dip">
-  <p>Kazananlar, taahhüt edilen listenin özeti ile önceden ilan edilmiş bir Bitcoin
-    bloğunun hash'inden türetilir. Liste kilitlendikten sonra değiştirilemez; blok
-    kazılmadan önce sonuç bilinemez.</p>
-  <p><a href="{{REPO_URL}}" rel="noopener">Kaynak kodu</a> · Listeden çıkarılma talepleri için {{CONTACT}}</p>
+  <p>Liste kilitlendikten sonra değiştirilemez, blok kazılmadan önce sonuç bilinemez.
+    <a href="{{REPO_URL}}" rel="noopener">Kaynak kodu</a></p>
 </footer>
 
 <script>window.__CEKILIS__ = {{DRAW_JSON}};</script>
