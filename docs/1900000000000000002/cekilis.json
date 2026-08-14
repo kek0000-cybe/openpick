@@ -6,7 +6,7 @@
   "committedAt": "2026-08-14T09:23:37.468Z",
   "drawAt": "2026-08-14T10:53:37.468Z",
   "drawnAt": null,
-  "publishedAt": "2026-08-14T09:52:35.643Z",
+  "publishedAt": "2026-08-14T10:49:03.136Z",
   "participantCount": 420,
   "rejectedCount": 2,
   "filters": {
@@ -18,10 +18,15 @@
   "commitTweetUrl": null,
   "winnerCount": 1,
   "backupCount": 0,
-  "bitcoin": {
+  "randomness": {
+    "source": "bitcoin",
+    "round": null,
+    "chain": null,
+    "roundAt": null,
     "tipAtCommit": 962403,
     "targetHeight": 962412,
-    "blockHash": null
+    "value": null,
+    "confirmedBy": null
   },
   "seed": null,
   "winners": null,

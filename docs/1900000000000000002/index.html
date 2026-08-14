@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DEMO — geri sayim ornegi — openpick</title>
 <meta name="description" content="Gercek bir odul degil, geri sayimi gostermek icin uretilmis ornek · 420 katılımcı · kanıtlanabilir adil çekiliş">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://blockstream.info https://mempool.emzy.de https://mempool.space">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.drand.sh https://api2.drand.sh https://api3.drand.sh https://blockstream.info https://mempool.emzy.de https://mempool.space">
 <meta property="og:type" content="article">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:site_name" content="openpick">
@@ -69,9 +69,9 @@
       <div data-phase="blok-bekleniyor">
         <div class="sayac-etiket">
           <svg class="hrk-donuyor" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
-          Blok bekleniyor
+          Sonuç hesaplanıyor
         </div>
-        <p class="orta ikincil" id="watch-status">Hedef blok sorgulanıyor…</p>
+        <p class="orta ikincil" id="watch-status">Rastgelelik sorgulanıyor…</p>
         <div class="orta"><button id="watch-retry" class="dugme gizli" type="button">Tekrar dene</button></div>
       </div>
 
@@ -107,9 +107,9 @@
           <div class="bilgi-deger duz">420 kişi · 2 eleme</div></div>
         <div class="bilgi"><div class="bilgi-ad">Liste özeti</div>
           <div class="bilgi-deger">cce00d0e59a390c2e4da448c06be06de360fb88bc7d6046b307706e0c05ad36a</div></div>
-        <div class="bilgi"><div class="bilgi-ad">Bitcoin bloğu</div>
-          <div class="bilgi-deger duz"><a href="https://blockstream.info/block-height/962412" rel="noopener">962412</a></div></div>
-        <div class="bilgi"><div class="bilgi-ad">Blok hash</div>
+        <div class="bilgi"><div class="bilgi-ad">Rastgelelik kaynağı</div>
+          <div class="bilgi-deger duz"><a href="https://blockstream.info/block-height/962412" rel="noopener">Bitcoin bloğu 962412</a></div></div>
+        <div class="bilgi"><div class="bilgi-ad">Gelen değer</div>
           <div class="bilgi-deger" id="f-blockhash">—</div></div>
         <div class="bilgi"><div class="bilgi-ad">Tohum</div>
           <div class="bilgi-deger" id="f-seed">—</div></div>
@@ -135,7 +135,7 @@
     <a href="https://github.com/kek0000-cybe/openpick" rel="noopener">Kaynak kodu</a></p>
 </footer>
 
-<script>window.__CEKILIS__ = {"tweetId":"1900000000000000002","tweetUrl":"https://x.com/ornek/status/1900000000000000002","title":"DEMO — geri sayim ornegi","prize":"Gercek bir odul degil, geri sayimi gostermek icin uretilmis ornek","committedAt":"2026-08-14T09:23:37.468Z","drawAt":"2026-08-14T10:53:37.468Z","drawnAt":null,"publishedAt":"2026-08-14T09:52:35.643Z","participantCount":420,"rejectedCount":2,"filters":{"mustHaveAvatar":true,"minTweets":100,"minAccountAgeDays":30},"commit":"cce00d0e59a390c2e4da448c06be06de360fb88bc7d6046b307706e0c05ad36a","commitTweetUrl":null,"winnerCount":1,"backupCount":0,"bitcoin":{"tipAtCommit":962403,"targetHeight":962412,"blockHash":null},"seed":null,"winners":null,"backups":null,"steps":null};</script>
+<script>window.__CEKILIS__ = {"tweetId":"1900000000000000002","tweetUrl":"https://x.com/ornek/status/1900000000000000002","title":"DEMO — geri sayim ornegi","prize":"Gercek bir odul degil, geri sayimi gostermek icin uretilmis ornek","committedAt":"2026-08-14T09:23:37.468Z","drawAt":"2026-08-14T10:53:37.468Z","drawnAt":null,"publishedAt":"2026-08-14T10:49:03.136Z","participantCount":420,"rejectedCount":2,"filters":{"mustHaveAvatar":true,"minTweets":100,"minAccountAgeDays":30},"commit":"cce00d0e59a390c2e4da448c06be06de360fb88bc7d6046b307706e0c05ad36a","commitTweetUrl":null,"winnerCount":1,"backupCount":0,"randomness":{"source":"bitcoin","round":null,"chain":null,"roundAt":null,"tipAtCommit":962403,"targetHeight":962412,"value":null,"confirmedBy":null},"seed":null,"winners":null,"backups":null,"steps":null};</script>
 <script>
 /**
  * Çekiliş motorunun tarayıcı sürümü — src/fairness.js ile BİREBİR aynı sonucu
@@ -327,6 +327,107 @@ async function hashAtHeightConfirmed(height) {
   return { hash: results[0].hash, confirmedBy: 2 };
 }
 
+/**
+ * drand — halka acik dogrulanabilir rastgelelik agi (League of Entropy).
+ * Hem tarayici hem Node ayni dosyayi kullanir.
+ *
+ * NEDEN BITCOIN YERINE BU:
+ * Bitcoin'de blok araligi ~10 dakika, yani cekilis icin en az o kadar beklemek
+ * gerekiyordu. drand her 3 SANIYEDE bir yeni deger uretiyor — sonuc aninda
+ * geliyor ama garanti aynen duruyor:
+ *
+ *   - Tur numarasi zamandan kesin hesaplanir: tur = (zaman - genesis) / 3
+ *     Yani "su saatte hangi turu kullanacagiz" onceden ilan edilebilir.
+ *   - O turun degeri, turun zamani gelmeden URETILMEZ. Dagitik bir esik
+ *     imza agi uretir; tek bir taraf onceden bilemez ve etkileyemez.
+ *   - Deger yayinlandiktan sonra herkes ayni adresten dogrulayabilir.
+ *
+ * Yani "bekleme yok" ile "sonucu kimse onceden bilemez" ayni anda saglanir.
+ */
+const DRAND = {
+  chain: '52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971',
+  genesis: 1692803367,
+  period: 3,
+  mirrors: [
+    'https://api.drand.sh',
+    'https://api2.drand.sh',
+    'https://api3.drand.sh',
+  ],
+};
+
+/** Verilen ana (unix saniye) denk gelen tur numarasi. */
+function roundAt(unixSeconds) {
+  return Math.floor((unixSeconds - DRAND.genesis) / DRAND.period) + 1;
+}
+
+/** Turun gerceklesecegi an (unix saniye). */
+function roundTime(round) {
+  return DRAND.genesis + (round - 1) * DRAND.period;
+}
+
+function currentRound() {
+  return roundAt(Math.floor(Date.now() / 1000));
+}
+
+const DRAND_TIMEOUT = 8000;
+
+async function drandGetir(yol) {
+  const hatalar = [];
+  for (const base of DRAND.mirrors) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), DRAND_TIMEOUT);
+    try {
+      const res = await fetch(`${base}/${DRAND.chain}${yol}`, { signal: ctrl.signal });
+      if (res.status === 404) return null;
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      hatalar.push(`${base}: ${err.message}`);
+    } finally {
+      clearTimeout(t);
+    }
+  }
+  throw new Error(`drand aynalarina ulasilamadi — ${hatalar.join(' | ')}`);
+}
+
+/** Bir turun rastgeleligi; tur henuz gelmediyse null. */
+async function randomnessAt(round) {
+  const veri = await drandGetir(`/public/${round}`);
+  if (!veri?.randomness) return null;
+  if (!/^[0-9a-f]{64}$/.test(veri.randomness)) throw new Error('drand gecersiz deger dondu');
+  return { round: veri.round, randomness: veri.randomness, signature: veri.signature };
+}
+
+/**
+ * Ayni turu iki BAGIMSIZ aynadan dogrular.
+ * Tek bir aynanin yanlis ya da geride kalmis veri vermesine karsi ucuz koruma.
+ */
+async function randomnessConfirmed(round) {
+  const sonuclar = [];
+  for (const base of DRAND.mirrors) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), DRAND_TIMEOUT);
+    try {
+      const res = await fetch(`${base}/${DRAND.chain}/public/${round}`, { signal: ctrl.signal });
+      if (res.status === 404) return { randomness: null, confirmedBy: 0 };
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const v = await res.json();
+      if (/^[0-9a-f]{64}$/.test(v.randomness ?? '')) sonuclar.push(v.randomness);
+      if (sonuclar.length >= 2) break;
+    } catch {
+      /* sonraki aynaya gec */
+    } finally {
+      clearTimeout(t);
+    }
+  }
+  if (sonuclar.length === 0) return { randomness: null, confirmedBy: 0 };
+  if (sonuclar.length === 1) return { randomness: sonuclar[0], confirmedBy: 1 };
+  if (sonuclar[0] !== sonuclar[1]) {
+    throw new Error('drand aynalari farkli deger bildirdi — sonuc aciklanmayacak.');
+  }
+  return { randomness: sonuclar[0], confirmedBy: 2 };
+}
+
 /*
  * Çekiliş sayfasının davranışı.
  *
@@ -350,7 +451,7 @@ const EVRE_ADI = {
 
 function pPhase(now = Date.now()) {
   if (!pDraw.commit) return 'acik';
-  if (pDraw.bitcoin?.blockHash || pRevealed.blockHash) return 'sonuclandi';
+  if (pDraw.randomness?.value || pRevealed.blockHash) return 'sonuclandi';
   if (now < new Date(pDraw.drawAt).getTime()) return 'kilitli';
   return 'blok-bekleniyor';
 }
@@ -416,31 +517,50 @@ function pIzlemeBaslat() {
 }
 
 async function pIzlemeDongusu() {
-  const height = pDraw.bitcoin.targetHeight;
+  const kaynak = pDraw.randomness;
+  const drand = kaynak.source === 'drand';
   const durum = pEl('watch-status');
+  // drand 3 saniyede bir üretiyor, Bitcoin ~10 dakikada. Boşuna sorgu atmayalım.
+  const bekle = () => (drand ? 2000 : 20000 + Math.random() * 20000);
 
   while (Date.now() < pDurmaAni) {
-    if (document.visibilityState === 'hidden') { await pSleep(5000); continue; }
+    if (document.visibilityState === 'hidden') { await pSleep(3000); continue; }
     try {
-      const tip = await currentHeight();
-      if (durum) {
-        const uzak = Math.max(0, height - tip);
-        durum.textContent = uzak === 0
-          ? 'Blok kazıldı, sonuç hesaplanıyor…'
-          : `Hedef blok ${height} · şu anki yükseklik ${tip} · yaklaşık ${uzak * 10} dakika`;
-      }
-      const { hash, confirmedBy } = await hashAtHeightConfirmed(height);
-      if (hash) {
-        pRevealed.blockHash = hash;
-        pRevealed.confirmedBy = confirmedBy;
-        await pCanliHesapla(hash);
-        return;
+      if (drand) {
+        const suan = currentRound();
+        const kalan = Math.max(0, kaynak.round - suan);
+        if (durum) {
+          durum.textContent = kalan === 0
+            ? 'Değer geldi, sonuç hesaplanıyor…'
+            : `drand turu ${kaynak.round} · şu an ${suan} · yaklaşık ${kalan * 3} saniye`;
+        }
+        const { randomness, confirmedBy } = await randomnessConfirmed(kaynak.round);
+        if (randomness) {
+          pRevealed.blockHash = randomness;
+          pRevealed.confirmedBy = confirmedBy;
+          await pCanliHesapla(randomness);
+          return;
+        }
+      } else {
+        const tip = await currentHeight();
+        if (durum) {
+          const uzak = Math.max(0, kaynak.targetHeight - tip);
+          durum.textContent = uzak === 0
+            ? 'Blok kazıldı, sonuç hesaplanıyor…'
+            : `Hedef blok ${kaynak.targetHeight} · şu an ${tip} · yaklaşık ${uzak * 10} dakika`;
+        }
+        const { hash, confirmedBy } = await hashAtHeightConfirmed(kaynak.targetHeight);
+        if (hash) {
+          pRevealed.blockHash = hash;
+          pRevealed.confirmedBy = confirmedBy;
+          await pCanliHesapla(hash);
+          return;
+        }
       }
     } catch (err) {
-      if (durum) durum.textContent = `Blok sorgulanamadı: ${err.message} — tekrar denenecek.`;
+      if (durum) durum.textContent = `Sorgulanamadı: ${err.message} — tekrar denenecek.`;
     }
-    // Sıçramalı bekleme: yüzlerce ziyaretçi aynı anda ücretsiz API'yi dövmesin.
-    await pSleep(20000 + Math.random() * 20000);
+    await pSleep(bekle());
   }
   pEl('watch-retry')?.classList.remove('gizli');
   pIzliyor = false;
@@ -468,11 +588,11 @@ async function pSonucCiz() {
   pCizildi = true;
 
   const d = pRevealed.result
-    ? { ...pDraw, ...pRevealed.result, bitcoin: { ...pDraw.bitcoin, blockHash: pRevealed.blockHash } }
+    ? { ...pDraw, ...pRevealed.result, randomness: { ...pDraw.randomness, value: pRevealed.blockHash } }
     : pDraw;
 
   const bh = pEl('f-blockhash');
-  if (bh) bh.textContent = d.bitcoin?.blockHash || '—';
+  if (bh) bh.textContent = d.randomness?.value || '—';
   const sd = pEl('f-seed');
   if (sd) sd.textContent = d.seed || '—';
 

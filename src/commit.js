@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { drawDir, readJson, writeJson } from './paths.js';
-import { applyFilters } from './filters.js';
+import { applyFilters, filtreDenetimi } from './filters.js';
 import { commitHash, canonicalize } from './fairness.js';
 import { currentHeight } from './bitcoin.js';
 import { roundAt, roundTime, DRAND } from './beacon.js';
@@ -75,6 +75,27 @@ if (args.drawAt) {
 }
 if (drawAt <= now) {
   console.error('\n  Cekilis ani gelecekte olmali.\n');
+  process.exit(1);
+}
+
+/*
+ * Filtre, dayandigi veri gercekten toplanmadan uygulanirsa herkesi eler ve
+ * cekilis kucuk, tesadufi bir alt kumede yapilir. Bu sessiz olmamali.
+ */
+const sorunlu = filtreDenetimi(data.users, args.filters);
+if (sorunlu.length) {
+  console.error(`
+  DURDURULDU — su filtreler, toplanmamis veriye dayaniyor:
+    ${sorunlu.join('\n    ')}
+
+  Bu alanlar katilimcilarin neredeyse tamaminda bos. Filtreyi uygularsak
+  herkes elenir ve cekilis kucuk bir alt kumede yapilir.
+
+  Cozum: listeyi guncel kodla yeniden topla
+    npm run collect -- --url ${data.tweetUrl}
+
+  Ya da bu filtreleri kullanma.
+`);
   process.exit(1);
 }
 

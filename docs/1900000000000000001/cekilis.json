@@ -6,7 +6,7 @@
   "committedAt": "2026-08-14T08:23:37.464Z",
   "drawAt": "2026-08-14T08:53:37.464Z",
   "drawnAt": "2026-08-14T09:23:37.465Z",
-  "publishedAt": "2026-08-14T09:52:35.636Z",
+  "publishedAt": "2026-08-14T10:49:03.130Z",
   "participantCount": 180,
   "rejectedCount": 2,
   "filters": {
@@ -18,10 +18,15 @@
   "commitTweetUrl": "https://x.com/ornek/status/1900000000000000001",
   "winnerCount": 3,
   "backupCount": 2,
-  "bitcoin": {
+  "randomness": {
+    "source": "bitcoin",
+    "round": null,
+    "chain": null,
+    "roundAt": null,
     "tipAtCommit": 962393,
     "targetHeight": 962399,
-    "blockHash": "000000000000000000001aef96daf1bc5601dc76e93f0ebe7551c76d6aa03bb8"
+    "value": "000000000000000000001aef96daf1bc5601dc76e93f0ebe7551c76d6aa03bb8",
+    "confirmedBy": 2
   },
   "seed": "d8eab116ad8e9b4dfd296922b446b7227e22b7aab3490c838fa46fac7e33642e",
   "winners": [

@@ -42,10 +42,16 @@ const kaynak = kaynakBilgisi(commitment);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const saat = () => new Date().toLocaleTimeString('tr-TR');
 
+/**
+ * ⚠️ shell:true KULLANMA. Windows'ta argumanlar kacislanmadan birlestiriliyor,
+ *    yani `-m "cekilis 208799..."` mesaji bosluktan bolunup id git'e dosya
+ *    yolu gibi geciyordu ("pathspec did not match any file"). Dizi olarak
+ *    gecirmek hem dogru hem guvenli.
+ */
 function calistir(komut, argv) {
   return new Promise((resolve, reject) => {
-    const ps = spawn(komut, argv, { cwd: ROOT, stdio: 'inherit', shell: komut === 'git' });
-    ps.on('close', (kod) => (kod === 0 ? resolve() : reject(new Error(`cikis kodu ${kod}`))));
+    const ps = spawn(komut, argv, { cwd: ROOT, stdio: 'inherit' });
+    ps.on('close', (kod) => (kod === 0 ? resolve() : reject(new Error(`${komut} cikis kodu ${kod}`))));
     ps.on('error', reject);
   });
 }
@@ -65,34 +71,17 @@ console.log(`
 const aralik = kaynak.source === 'drand' ? 2000 : 60_000;
 let sonMesaj = '';
 
+/*
+ * 1) BEKLEME. Bu dongu YALNIZCA rastgeleligi bekler.
+ *    Tamamlama adimlari bilerek disarida: iceride olsaydi, push hata
+ *    verdiginde catch onu "sorgu basarisiz" sayip basa donuyor ve cekilis
+ *    sonsuza kadar yeniden yayinlaniyordu. Yasandi.
+ */
+let etiket = '';
 while (true) {
   try {
     const r = await rastgeleligiAl(commitment);
-    if (r.hazir) {
-      console.log(`\n  [${saat()}] ${r.etiket} hazir. Cekilis yapiliyor...\n`);
-
-      if (!fs.existsSync(path.join(dir, 'result.json'))) {
-        await calistir(process.execPath, ['src/draw.js', '--tweet', args.tweetId,
-          '--winners', String(args.winners), '--backups', String(args.backups)]);
-      } else {
-        console.log('  (sonuc zaten vardi, cekilis atlandi)');
-      }
-
-      console.log(`\n  [${saat()}] Site uretiliyor...\n`);
-      await calistir(process.execPath, ['src/publish.js', '--tweet', args.tweetId]);
-
-      if (args.push) {
-        console.log(`\n  [${saat()}] Siteye gonderiliyor...\n`);
-        await calistir('git', ['add', '-A']);
-        await calistir('git', ['commit', '-m', `cekilis ${args.tweetId}`]);
-        await calistir('git', ['push']);
-        console.log('\n  Yayinlandi. Birkac dakika icinde sitede gorunur.\n');
-      } else {
-        console.log('\n  Yerelde hazir. Gondermek icin: git add -A; git commit -m "cekilis"; git push\n');
-      }
-      break;
-    }
-
+    if (r.hazir) { etiket = r.etiket; break; }
     if (r.mesaj !== sonMesaj) {
       sonMesaj = r.mesaj;
       console.log(`  [${saat()}] ${r.mesaj}`);
@@ -101,4 +90,40 @@ while (true) {
     console.log(`  [${saat()}] sorgu basarisiz: ${err.message} — tekrar denenecek`);
   }
   await sleep(aralik);
+}
+
+/* 2) TAMAMLAMA. Her adim bir kez calisir; hata olursa durur, dongmez. */
+try {
+  console.log(`\n  [${saat()}] ${etiket} hazir. Cekilis yapiliyor...\n`);
+  if (fs.existsSync(path.join(dir, 'result.json'))) {
+    console.log('  (sonuc zaten vardi, cekilis atlandi)');
+  } else {
+    await calistir(process.execPath, ['src/draw.js', '--tweet', args.tweetId,
+      '--winners', String(args.winners), '--backups', String(args.backups)]);
+  }
+
+  console.log(`\n  [${saat()}] Site uretiliyor...\n`);
+  await calistir(process.execPath, ['src/publish.js', '--tweet', args.tweetId]);
+
+  if (args.push) {
+    console.log(`\n  [${saat()}] Siteye gonderiliyor...\n`);
+    await calistir('git', ['add', '-A']);
+    await calistir('git', ['commit', '-m', `cekilis ${args.tweetId}`]);
+    await calistir('git', ['push']);
+    console.log('\n  Yayinlandi. Birkac dakika icinde sitede gorunur.\n');
+  } else {
+    console.log('\n  Yerelde hazir. Gondermek icin: git add -A; git commit -m "cekilis"; git push\n');
+  }
+} catch (err) {
+  console.error(`
+  Tamamlama adimi basarisiz: ${err.message}
+
+  Cekilis sonucu bozulmadi; yalnizca son adim yarim kaldi.
+  Elle tamamlamak icin:
+    npm run publish -- --tweet ${args.tweetId}
+    git add -A
+    git commit -m "cekilis"
+    git push
+`);
+  process.exit(1);
 }

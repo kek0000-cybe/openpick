@@ -14,6 +14,39 @@ export const DEFAULT_FILTERS = {
 
 const days = (ms) => ms / 86_400_000;
 
+/**
+ * Bir filtreyi uygulamadan ONCE, dayandigi alanin gercekten olculup
+ * olculmedigini denetler.
+ *
+ * ⚠️ NEDEN VAR: X alan yapisini degistirdiginde tweet sayisi herkeste 0
+ *    geliyordu. "En az 100 tweet" filtresi bunu "hicbiri yeterli degil" diye
+ *    okuyup 6421 kisiden 6381'ini eledi ve cekilis, verisi kazara guncel olan
+ *    40 kisi arasinda yapildi. Sessiz ve tamamen yanlis bir sonucti.
+ *
+ *    Bir alan HERKESTE bossa bu bir olcum degil, veri eksikligidir; o alana
+ *    dayanan filtre uygulanmamali, calisiyormus gibi yapip herkesi elememeli.
+ */
+export function filtreDenetimi(users, filters = {}) {
+  const f = { ...DEFAULT_FILTERS, ...filters };
+  if (users.length < 20) return [];
+  const oran = (fn) => users.filter(fn).length / users.length;
+  const sorunlar = [];
+
+  if (f.minTweets > 0 && oran((u) => !u.tweets) > 0.95) {
+    sorunlar.push('tweet sayisi (--min-tweets)');
+  }
+  if (f.mustHaveDescription && oran((u) => !u.description) > 0.98) {
+    sorunlar.push('biyografi (--require-bio)');
+  }
+  if (f.mustHaveBanner && oran((u) => !u.hasBanner) > 0.98) {
+    sorunlar.push('kapak gorseli (--require-banner)');
+  }
+  if (f.minAccountAgeDays > 0 && oran((u) => !u.createdAt) > 0.5) {
+    sorunlar.push('hesap yasi (--min-age-days)');
+  }
+  return sorunlar;
+}
+
 export function applyFilters(users, filters = {}, now = new Date()) {
   const f = { ...DEFAULT_FILTERS, ...filters };
   const excluded = new Set(f.excludeHandles.map((h) => h.replace(/^@/, '').toLowerCase()));

@@ -102,7 +102,9 @@ async function publishDraw(tweetId) {
   }
   const src = path.join(DATA_DIR, tweetId);
   const record = readJson(path.join(src, 'result.json')) ?? readJson(path.join(src, 'commitment.json'));
-  if (!record) throw new Error(`${tweetId} icin commitment.json ya da result.json yok`);
+  // Taahhut verilmemis cekilis (yalnizca toplanmis) normal bir durumdur:
+  // yayinlanacak bir sey yok, hata degil. Sadece --tweet ile acikca istenirse uyarir.
+  if (!record) return null;
 
   const dstDir = path.join(outRoot, tweetId);
   fs.mkdirSync(path.join(dstDir, 'avatar'), { recursive: true });
@@ -316,6 +318,10 @@ if (ids.length === 0) {
 const published = [];
 for (const id of ids) {
   const pub = await publishDraw(id);
+  if (!pub) {
+    console.log(`  atlandi   : ${id} (taahhut verilmemis)`);
+    continue;
+  }
   published.push(pub);
   console.log(`  yayinlandi: ${id} (${pub.participantCount} katilimci)`);
 }
