@@ -83,8 +83,37 @@ klasöründe kalır — şifren hiçbir yere yazılmaz.
 npm run collect -- --url https://x.com/kullanici/status/123456 --types retweets,likes
 ```
 
+`--types` değerleri: `retweets`, `likes`, `replies` (virgülle birlikte kullanılabilir).
 `--max 5000` üst sınır, `--slow` daha güvenli tempo. Uzun süren çekilişlerde arada bir
 tekrar çalıştır; yeni katılımcılar eklenir, tekrarlar ayıklanır.
+
+### Yorumdan katılanlar ve kimlik listesi
+
+"Yoruma ID'ni yaz" tarzı çekilişlerde `--types replies` kullan. Toplama sırasında
+yorum metni saklanır ve içinden kimlik çıkarılmaya çalışılır. Sonra:
+
+```bash
+npm run liste -- --tweet 123456
+```
+
+`kimlikler.csv` üretir (Excel'de açılır): X hesabı, tahmini kimlik, güven düzeyi,
+ham yorum ve profil linki.
+
+Kimlik çıkarımı **tahmindir** ve üç düzeyde işaretlenir:
+
+| Güven | Anlamı |
+|---|---|
+| `kesin` | Yorumda "id:", "nick:", "username:" gibi bir etiket vardı |
+| `SUPHELI` | Etiket yoktu, en olası kelime seçildi — gözden geçir |
+| `KIMLIK YOK` | Yorumda kimlik yok (örn. sadece "güzel site" yazmış) |
+
+Ham yorum her satırda durduğu için şüpheli olanları dosyada elle düzeltebilirsin.
+Çekiliş bu listeden değil, X hesaplarından yapılır; kimlik yalnızca ödülü kime
+vereceğini bilmen için.
+
+Aynı kişi birden çok yorum yazmışsa yalnızca ilki sayılır. Yanıt akışına karışan
+alakasız tweetler (reklamlar) konuşma kimliğiyle elenir, düzenleyenin kendi
+mesajları da listeye girmez.
 
 ### 3. Katılımı kapat ve taahhüt et
 

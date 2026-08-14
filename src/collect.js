@@ -2,10 +2,14 @@ import { chromium } from 'playwright';
 import path from 'node:path';
 import fs from 'node:fs';
 import { PROFILE_DIR, drawDir, parseTweetUrl, readJson, writeJson } from './paths.js';
+import { kimlikTahmini } from './kimlik.js';
 
 const SOURCES = {
   retweets: { suffix: '/retweets', match: /\/graphql\/[^/]+\/Retweeters/ },
   likes: { suffix: '/likes', match: /\/graphql\/[^/]+\/Favoriters/ },
+  // Yorumlar tweetin kendi sayfasindan gelir ve yapisi digerlerinden farklidir:
+  // kullanici degil TWEET listesi doner, kullanici her tweetin icindedir.
+  replies: { suffix: '', match: /\/graphql\/[^/]+\/TweetDetail/, kind: 'reply' },
 };
 
 function parseArgs(argv) {
@@ -94,6 +98,51 @@ function saglikKontrolu(users) {
 }
 
 /**
+ * Yorumdan katilimci kimligini tahmin eder.
+ *
+ * Insanlar serbest yaziyor: "Katildim id ::::Firat27", "fes23 katildim",
+ * "Id: kanboz121820gma", "user name 6q : virguest". Bu yuzden cikarim
+ * TAHMINDIR ve ham metin her zaman yaninda saklanir — supheli olanlari
+ * gozle kontrol edebilmek icin.
+ */
+/**
+ * Yorumlari cikarir. Ucu birden zorunlu:
+ *   - yalnizca BU konusmaya ait olanlar (yanit akisina reklam tweetleri karisiyor)
+ *   - duzenleyenin kendi mesajlari haric
+ *   - ayni kisi birden cok yazmis olabilir; tekrarlar sonra ayiklanir
+ */
+function extractReplies(json, tweetId) {
+  const tweetler = [];
+  (function ara(x) {
+    if (!x || typeof x !== 'object') return;
+    if (Array.isArray(x)) { x.forEach(ara); return; }
+    if (x.__typename === 'Tweet' && x.rest_id && x.legacy) { tweetler.push(x); return; }
+    for (const v of Object.values(x)) ara(v);
+  })(json);
+
+  const yazan = (t) => t.core?.user_results?.result ?? null;
+  const anaTweet = tweetler.find((t) => t.rest_id === tweetId);
+  const duzenleyen = anaTweet
+    ? (yazan(anaTweet)?.core?.screen_name ?? yazan(anaTweet)?.legacy?.screen_name ?? '').toLowerCase()
+    : null;
+
+  const cikti = [];
+  for (const t of tweetler) {
+    if (t.legacy.conversation_id_str !== tweetId) continue;   // baska konusma
+    if (t.rest_id === tweetId) continue;                       // cekilis tweetinin kendisi
+    const u = yazan(t);
+    if (!u) continue;
+    const user = normalizeUser(u);
+    if (!user) continue;
+    if (duzenleyen && user.handle.toLowerCase() === duzenleyen) continue; // duzenleyenin mesajlari
+    const metin = t.note_tweet?.note_tweet_results?.result?.text ?? t.legacy.full_text ?? '';
+    const { id, kesin } = kimlikTahmini(metin);
+    cikti.push({ ...user, replyText: metin, replyId: id, replyIdKesin: kesin, replyAt: t.legacy.created_at });
+  }
+  return cikti;
+}
+
+/**
  * Yanitin icinde nerede olursa olsun kullanici objelerini bulur.
  * Sabit bir yol (data.retweeters_timeline...) yazmiyoruz; X ic yapiyi degistirdiginde
  * kirilmasin diye agaci geziyoruz.
@@ -113,7 +162,7 @@ function extractUsers(node, out = []) {
 }
 
 async function collectSource(page, tweetUrl, type, opts) {
-  const { suffix, match } = SOURCES[type];
+  const { suffix, match, kind } = SOURCES[type];
   const found = new Map();
   let rateLimited = false;
   let sawResponse = false;
@@ -135,8 +184,12 @@ async function collectSource(page, tweetUrl, type, opts) {
         fs.writeFileSync(hedef, JSON.stringify(json, null, 2), 'utf8');
         console.log(`\n  Ham yanit kaydedildi: ${hedef}`);
       }
-      for (const user of extractUsers(json)) {
-        if (!found.has(user.handle.toLowerCase())) found.set(user.handle.toLowerCase(), user);
+      const bulunan = kind === 'reply' ? extractReplies(json, opts.tweetId) : extractUsers(json);
+      for (const user of bulunan) {
+        const key = user.handle.toLowerCase();
+        // Ayni kisi birden cok yorum yazmis olabilir (ornekte biri 5 kez yazdi).
+        // Ilk yorumu esas aliyoruz; sonrakiler katilimi tekrarlamaktan ibaret.
+        if (!found.has(key)) found.set(key, user);
       }
     } catch {
       /* JSON olmayan yanitlari yoksay */
