@@ -149,6 +149,8 @@
           <div>
             <label class="onay"><input type="checkbox" id="tRt" checked> Retweet edenler</label>
             <label class="onay"><input type="checkbox" id="tLike"> Beğenenler</label>
+            <label class="onay"><input type="checkbox" id="tReply"> Yorum yapanlar
+              <span class="ipucu">(“ID’ni yaz” çekilişleri için)</span></label>
             <label class="onay"><input type="checkbox" id="tSlow"> Yavaş mod <span class="ipucu">(daha güvenli)</span></label>
           </div>
           <div class="alan"><label for="max">Üst sınır</label>
@@ -161,6 +163,26 @@
           <button class="dugme" id="ileri2" type="button">Taahhüde geç</button>
         </div>
         <div class="kayit gizli" id="log2"></div>
+      </div>
+    </div>
+
+    <div class="duzlem gizli" id="kimlikKutu">
+      <div class="duzlem-bas">
+        <span class="duzlem-baslik">Kimlik listesi</span>
+        <span class="ucuncul" id="kimlikOzet"></span>
+      </div>
+      <div class="duzlem-govde">
+        <p class="ucuncul">Yorumdan çıkarılan kimlikler. Çıkarım tahmindir:
+          <strong style="color: var(--c-ok-text)">kesin</strong> = yorumda “id:” gibi bir
+          etiket vardı, <strong style="color: var(--c-warn-text)">şüpheli</strong> = etiket
+          yoktu en olası kelime seçildi. Şüphelileri gözden geçir.</p>
+        <div style="overflow-x: auto">
+          <table id="kimlikTablo" style="width:100%; border-collapse: collapse; font-size: var(--fs-3)"></table>
+        </div>
+        <div class="dugmeler">
+          <button class="dugme" id="kimlikYenile" type="button">Listeyi yenile</button>
+          <a class="dugme" id="kimlikIndir" href="#">CSV indir</a>
+        </div>
       </div>
     </div>
   </section>
@@ -272,17 +294,53 @@ $('ileri1').addEventListener('click', async () => {
 $('loginBtn').addEventListener('click', () => calistir('login', {}, 'log2'));
 
 /* adim 2 */
-$('topla').addEventListener('click', () => {
+$('topla').addEventListener('click', async () => {
   const types = [];
   if ($('tRt').checked) types.push('retweets');
   if ($('tLike').checked) types.push('likes');
+  if ($('tReply').checked) types.push('replies');
   if (!types.length) return alert('En az bir kaynak seç.');
-  calistir('collect', {
+  await calistir('collect', {
     url: $('url').value.trim(), types,
     max: $('max').value || undefined, slow: $('tSlow').checked,
   }, 'log2');
+  if ($('tReply').checked) kimlikYukle();
 });
 $('ileri2').addEventListener('click', () => goster(3));
+
+/* ---- kimlik listesi ---- */
+async function kimlikYukle() {
+  if (!durum.tweetId) return;
+  const r = await fetch('/api/kimlikler?tweet=' + durum.tweetId).then((x) => x.json()).catch(() => null);
+  if (!Array.isArray(r) || r.length === 0) return;
+
+  const renk = { kesin: 'var(--c-ok-text)', supheli: 'var(--c-warn-text)', yok: 'var(--c-text-3)' };
+  const etiket = { kesin: 'kesin', supheli: 'şüpheli', yok: 'kimlik yok' };
+  const hucre = (i, s = '') => `<td style="padding:var(--sp-4) var(--sp-5);border-bottom:1px solid var(--c-line);${s}">${i}</td>`;
+  const kacis = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  $('kimlikTablo').innerHTML =
+    `<tr style="text-align:left;color:var(--c-text-3);font-size:var(--fs-2)">
+       ${['X hesabı', 'Kimlik', 'Güven', 'Yorum'].map((h) => hucre(h)).join('')}
+     </tr>` +
+    r.map((s) => `<tr>
+      ${hucre('<a href="https://x.com/' + encodeURIComponent(s.handle) + '" rel="noopener">@' + kacis(s.handle) + '</a>')}
+      ${hucre(kacis(s.id ?? '—'), 'font-family:var(--ff-num)')}
+      ${hucre(etiket[s.guven], 'color:' + renk[s.guven])}
+      ${hucre(kacis(s.yorum.slice(0, 60)), 'color:var(--c-text-3)')}
+    </tr>`).join('');
+
+  const say = (g) => r.filter((s) => s.guven === g).length;
+  $('kimlikOzet').textContent = `${r.length} kişi · ${say('kesin')} kesin · ${say('supheli')} şüpheli · ${say('yok')} kimliksiz`;
+  $('kimlikKutu').classList.remove('gizli');
+}
+
+$('kimlikYenile').addEventListener('click', kimlikYukle);
+$('kimlikIndir').addEventListener('click', async (e) => {
+  e.preventDefault();
+  await calistir('liste', { tweetId: durum.tweetId }, 'log2');
+  window.location = '/api/kimlikler.csv?tweet=' + durum.tweetId;
+});
 
 /* adim 3 */
 $('ne-zaman').addEventListener('change', (e) =>

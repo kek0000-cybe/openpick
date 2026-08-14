@@ -4,6 +4,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { ROOT, DATA_DIR, readJson, parseTweetUrl } from './paths.js';
+import { kimlikTahmini } from './kimlik.js';
 
 /**
  * YEREL yonetim paneli. Tweet linkini yapistirip cekilisi bastan sona yurutursun.
@@ -57,6 +58,10 @@ const KOMUTLAR = {
   publish: (a) => {
     const id = String(a.tweetId).replace(/[^0-9]/g, '');
     return { args: ['src/publish.js', '--tweet', id], tweetId: id };
+  },
+  liste: (a) => {
+    const id = String(a.tweetId).replace(/[^0-9]/g, '');
+    return { args: ['src/liste.js', '--tweet', id], tweetId: id };
   },
   watch: (a) => {
     const id = String(a.tweetId).replace(/[^0-9]/g, '');
@@ -153,6 +158,34 @@ const server = http.createServer(async (req, res) => {
       const ids = fs.existsSync(DATA_DIR)
         ? fs.readdirSync(DATA_DIR).filter((d) => /^[0-9]{5,25}$/.test(d)) : [];
       return json(res, 200, ids.map(durum));
+    }
+    // Kimlik listesi: dosya uretmeden dogrudan hesaplanir, panelde tablo olarak gosterilir.
+    if (yol === '/api/kimlikler') {
+      const id = (url.searchParams.get('tweet') ?? '').replace(/[^0-9]/g, '');
+      const data = readJson(path.join(DATA_DIR, id, 'participants.json'));
+      if (!data) return json(res, 404, { hata: 'katilimci dosyasi yok' });
+      const yorumlu = data.users.filter((u) => u.replyText !== undefined);
+      return json(res, 200, yorumlu.map((u) => {
+        const t = u.replyId !== undefined
+          ? { id: u.replyId, kesin: u.replyIdKesin }
+          : kimlikTahmini(u.replyText);
+        return {
+          handle: u.handle,
+          id: t.id ?? null,
+          guven: t.kesin ? 'kesin' : (t.id ? 'supheli' : 'yok'),
+          yorum: (u.replyText ?? '').replace(/\s+/g, ' ').trim(),
+        };
+      }).sort((a, b) => (a.guven === b.guven ? 0 : a.guven === 'kesin' ? -1 : b.guven === 'kesin' ? 1 : 0)));
+    }
+    if (yol === '/api/kimlikler.csv') {
+      const id = (url.searchParams.get('tweet') ?? '').replace(/[^0-9]/g, '');
+      const dosya = path.join(DATA_DIR, id, 'kimlikler.csv');
+      if (!fs.existsSync(dosya)) return json(res, 404, { hata: 'once listeyi olustur' });
+      res.writeHead(200, {
+        'content-type': 'text/csv; charset=utf-8',
+        'content-disposition': `attachment; filename="kimlikler-${id}.csv"`,
+      });
+      return fs.createReadStream(dosya).pipe(res);
     }
     if (yol === '/api/cozumle' && req.method === 'POST') {
       const g = await govde(req);

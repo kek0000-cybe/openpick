@@ -89,10 +89,14 @@ tekrar çalıştır; yeni katılımcılar eklenir, tekrarlar ayıklanır.
 
 ### Yorumdan katılanlar ve kimlik listesi
 
-"Yoruma ID'ni yaz" tarzı çekilişlerde `--types replies` kullan. Toplama sırasında
-yorum metni saklanır ve içinden kimlik çıkarılmaya çalışılır. Sonra:
+"Yoruma ID'ni yaz" tarzı çekilişler için. **Panelde:** 2. adımda "Yorum yapanlar"
+kutusunu işaretle, topla — kimlik listesi tablo olarak altında çıkar, "CSV indir"
+ile dosyayı alırsın. Komut yazman gerekmez.
+
+Terminalden yapmak istersen:
 
 ```bash
+npm run collect -- --url <tweet-linki> --types replies
 npm run liste -- --tweet 123456
 ```
 
