@@ -47,6 +47,16 @@ function inlineModule(file) {
     .replace(/^export\s+/gm, '');
 }
 
+/**
+ * CSS adresine icerik ozeti eklenir: stil degistiginde adres de degisir.
+ * Bu olmadan geri donen ziyaretcinin tarayicisi eski stili onbellekten
+ * kullanir ve yeni HTML ile eslesmedigi icin sayfa bozuk gorunur.
+ */
+function cssSurumu() {
+  const css = fs.readFileSync(path.join(WEB, 'assets', 'site.css'));
+  return '?v=' + crypto.createHash('sha256').update(css).digest('hex').slice(0, 10);
+}
+
 function fill(template, tokens) {
   return template.replace(/\{\{([A-Z_]+)\}\}/g, (m, key) =>
     Object.prototype.hasOwnProperty.call(tokens, key) ? tokens[key] : m);
@@ -186,6 +196,7 @@ async function publishDraw(tweetId) {
     : '';
 
   const html = fill(fs.readFileSync(path.join(WEB, 'templates', 'cekilis.html'), 'utf8'), {
+    CSS_V: cssSurumu(),
     SITE_NAME: esc(cfg.siteName),
     TITLE: esc(title),
     DESC: esc(desc),
@@ -220,6 +231,7 @@ function publishShared(entries) {
 
   fs.writeFileSync(path.join(outRoot, 'dogrula', 'index.html'),
     fill(fs.readFileSync(path.join(WEB, 'templates', 'dogrula.html'), 'utf8'), {
+      CSS_V: cssSurumu(),
       SITE_NAME: esc(cfg.siteName),
       REPO_URL: esc(cfg.repoUrl),
       ENGINE: inlineModule('lib/engine.js'),
@@ -243,6 +255,7 @@ function publishShared(entries) {
 
   fs.writeFileSync(path.join(outRoot, 'index.html'),
     fill(fs.readFileSync(path.join(WEB, 'templates', 'index.html'), 'utf8'), {
+      CSS_V: cssSurumu(),
       SITE_NAME: esc(cfg.siteName),
       SITE_URL: esc(cfg.siteUrl),
       REPO_URL: esc(cfg.repoUrl),
